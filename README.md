@@ -21,8 +21,14 @@
 14. Postman https://www.postman.com/downloads/
 
 # Setup apps
+## Finder
+1. run in terminal: defaults write com.apple.finder AppleShowAllFiles YES
+2. settings/side menu show home checkbox
+3. settings/additional search in current folder
+
 ## Spectacle
-1. ln ~/.dotfiles/spectacle ~/Library/Application/Shortcuts.json Support/Spectacle/.
+1. rm -rf ~/Library/Application\ Support/Spectacle/Shortcuts.json
+2. ln ~/.dotfiles/spectacle/Shortcuts.json ~/Library/Application\ Support/Spectacle/Shortcuts.json
 
 ## iTerm
 1. Install InconsolataGo Nerd Font Complete from ~/.dotfiles/fonts

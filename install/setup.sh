@@ -21,6 +21,8 @@ chsh -s $(which zsh)
 source ~/.zshrc
 
 # setup vim
+rm -rf ~/.vim
+rm -rf ~/.vimrc
 ln -s ~/.dotfiles/vim ~/.vim
 ln -s ~/.dotfiles/vim/index.vim ~/.vimrc
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
