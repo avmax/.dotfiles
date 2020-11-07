@@ -1,6 +1,6 @@
 0. Download git@github.com:avmax/.dotfiles.git and put it to the ~/.
 1. cd ~/.dotfiles
-2. chmod 755 ./install.sh
+2. chmod 755 ./index.sh & chmod -R 755 ./install
 3. ./index.sh
 
 # Download apps
