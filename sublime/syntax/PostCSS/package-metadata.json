@@ -1,0 +1,1 @@
+{"platforms": ["*"], "sublime_text": "*", "description": "PostCSS syntax highlighting for Sublime Text.", "dependencies": [], "url": "https://github.com/hudochenkov/Syntax-highlighting-for-PostCSS", "version": "2.1.0"}

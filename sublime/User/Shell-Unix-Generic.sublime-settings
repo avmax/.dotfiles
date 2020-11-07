@@ -1,0 +1,9 @@
+{
+	"extensions":
+	[
+		".zshrc",
+		".zsh_aliases",
+		".zsh_functions",
+		".zsh_colors"
+	]
+}

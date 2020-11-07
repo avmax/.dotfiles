@@ -1,0 +1,46 @@
+{
+	"auto_refresh_sidebar": true,
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"AdvancedNewFile",
+		"All Autocomplete",
+		"Angular2 HTML Syntax",
+		"AngularJS",
+		"ArcticTypescript",
+		"BEMHTML",
+		"Boxy Theme",
+		"Bracketeer",
+		"BracketHighlighter",
+		"C Improved",
+		"ColorPicker",
+		"CTags",
+		"Emmet",
+		"Focus File on Sidebar",
+		"GitGutter",
+		"Jade",
+		"Material Theme",
+		"Numix Theme",
+		"Open Folder",
+		"Package Control",
+		"PackageResourceViewer",
+		"PostCSS Sorting",
+		"Pug",
+		"Sass",
+		"Seti_UI",
+		"SideBarEnhancements",
+		"SublimeLinter",
+		"Sunrise Theme",
+		"Syntax Highlighting for PostCSS",
+		"SyntaxManager",
+		"Theme - Cobalt2",
+		"Theme - Tech49",
+		"TypeScript",
+		"TypescriptCompletion"
+	],
+	"new_files_relative_to_project_root": true,
+	"new_folders_relative_to_project_root": true
+}

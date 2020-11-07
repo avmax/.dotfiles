@@ -1,0 +1,24 @@
+[user]
+    name = avmax
+    email = avmax.web@gmail.com
+[core]
+    editor = vim
+	excludesfile = /Users/avmax/.gitignore_global
+[color]
+    ui = true
+[alias]
+    co = checkout
+    st = status
+    br = branch
+
+    last = !"git hist -20"
+    hist = log --pretty=format:'(%Cred%h%C(reset) - %ar) [%Cred%cn%C(reset)] |%s|'
+    ancient = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[push]
+	default = simple
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Users/avmax/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true

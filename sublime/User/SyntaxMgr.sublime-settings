@@ -1,0 +1,16 @@
+{
+    "syntaxmgr_settings": [
+        {
+            "extensions": ["bemhtml", "bemhtml.js", "bemtree", "bemtree.js"],
+            "settings": {
+                "syntax": "Packages/syntax/BEMHTML/BEMHTML.tmLanguage"
+            }
+        },
+        {
+            "extensions": ["post.css"],
+            "settings": {
+                "syntax": "Packages/syntax/PostCSS/PostCSS.tmLanguage"
+            }
+        }
+    ]
+}
