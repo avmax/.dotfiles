@@ -21,9 +21,14 @@
 14. Postman https://www.postman.com/downloads/
 
 # Setup apps
+## Spectacle
+1. ln ~/.dotfiles/spectacle ~/Library/Application/Shortcuts.json Support/Spectacle/.
+
 ## iTerm
-1. Go to General/Preferences
-2. Load preferences from URL and select ~/.dotfiles/iterm
+1. Install InconsolataGo Nerd Font Complete from ~/.dotfiles/fonts
+2. Go to Settings/Profiles/Colors and in color presets select field choose Solarized Light
+3. Go to Settings/Profiles/Text and in choose InconsolataGo Nerd Font / Regular / 14 / 100 / 100 as primary font
+4. Go to Settings/Profiles/Text and change Cursor from Box to Vertical Bar
 
 ## VSCode
 1. Download Settings Sync plugin
