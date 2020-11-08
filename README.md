@@ -21,6 +21,10 @@
 14. Postman https://www.postman.com/downloads/
 
 # Setup apps
+## Screenshots
+1. mkdir ~/Screenshots
+2. defaults write com.apple.screencapture location ~/Screenshots
+
 ## Finder
 1. run in terminal: defaults write com.apple.finder AppleShowAllFiles YES
 2. settings/side menu show home checkbox
