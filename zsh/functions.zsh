@@ -1,204 +1,182 @@
-# a visual recursive list of all files and directories
-function tree() {
-    find . | sed -e 's/[^\/]*\//|--/g' -e 's/-- |/    |/g' | $PAGER
+# Shell functions.
+
+# --- directories --------------------------------------------------------------
+
+# up [n] — cd up n directories (default 1)
+up() {
+  local n=${1:-1}
+  [[ $n == <1-> ]] || { print -u2 "usage: up [levels]"; return 1 }
+  cd "$(printf '../%.0s' {1..$n})"
 }
 
-
-
-# recursive text search (ack is also nifty)
-function f() {
-    find . -name '*' | xargs grep -l $1
+# mkcddir <dir> — create a directory (and any missing parents) and cd into it
+mkcddir() {
+  (( $# == 1 )) || { print -u2 "usage: mkcddir <dir>"; return 1 }
+  mkdir -p -- "$1" && cd -- "$1"
 }
 
-
-
-# clean screen
-function cls {
-    osascript -e 'tell application "System Events" to keystroke "k" using command down' 
+# gitroot — cd to the top directory of the current git repository
+gitroot() {
+  local top
+  top=$(git rev-parse --show-toplevel) || return
+  cd -- "$top"
 }
 
+# --- files --------------------------------------------------------------------
 
-
-# recursive search and replace (ignoring hidden files and dirs), example: replace foo bar
-function replace() {
-  find . \( ! -regex '.*/\..*' \) -type f | xargs perl -pi -e "s/$1/$2/g"
+# f <text> [dir] — list files containing text; skips .git, node_modules, binaries
+f() {
+  (( $# )) || { print -u2 "usage: f <text> [dir]"; return 1 }
+  grep -rIl --exclude-dir=.git --exclude-dir=node_modules -- "$1" "${2:-.}"
 }
 
+# replace <from> <to> — replace literal text in every text file under the
+# current directory (skips .git, node_modules, binaries), then list the files
+# it changed. Review with `git diff`.
+replace() {
+  (( $# == 2 )) || { print -u2 "usage: replace <from> <to>"; return 1 }
+  # -F: match the text literally, exactly as the perl below replaces it
+  local -a files=(${(0)"$(grep -rIlF --null --exclude-dir=.git --exclude-dir=node_modules -- "$1" .)"})
+  (( $#files )) || { print -u2 "replace: no files contain '$1'"; return 1 }
+  FROM=$1 TO=$2 perl -pi -e 's/\Q$ENV{FROM}\E/$ENV{TO}/g' -- "${files[@]}"
+  print -rl -- "${files[@]}"
+}
 
-
-# cd ../ *arg
-function up {
-    if [[ "$#" < 1 ]] ; then
-        cd ..
-    else
-        CDSTR=""
-        for i in {1..$1} ; do
-            CDSTR="../$CDSTR"
-        done
-        cd $CDSTR
+# extract <archive>... — unpack into the current directory, by extension.
+# Carries on past a bad file and returns non-zero at the end.
+extract() {
+  (( $# )) || { print -u2 "usage: extract <archive>..."; return 1 }
+  local file rc=0
+  for file in "$@"; do
+    if [[ ! -f $file ]]; then
+      print -u2 "extract: '$file' is not a file"
+      rc=1
+      continue
     fi
+    case ${file:l} in   # lowercased, so .ZIP and .Z match too
+      # macOS tar is libarchive: it reads all of these, compressed or not
+      *.tar|*.tar.*|*.tgz|*.tbz|*.tbz2|*.txz|*.tzst|*.zip|*.7z|*.rar|*.xar|*.pkg|*.iso)
+                tar -xf "$file" ;;
+      *.gz)     gunzip -k "$file" ;;
+      *.bz2)    bunzip2 -k "$file" ;;
+      *.xz)     unxz -k "$file" ;;                               # needs brew xz
+      *.zst)    unzstd -q "$file" ;;                             # needs brew zstd
+      *.z)      uncompress -c "$file" > "${file%.?}" ;;
+      *)        print -u2 "extract: don't know how to extract '$file'"; false ;;
+    esac || rc=1
+  done
+  return $rc
 }
 
-
-
-# show spotify current track
-zsh_show_spotify_track() {
-  state=`osascript -e 'tell application "Spotify" to player state as string'`;
-  if [[ $state = "playing" ]]; then
-    artist=`osascript -e 'tell application "Spotify" to artist of current track as string'`;
-    track=`osascript -e 'tell application "Spotify" to name of current track as string'`;
-
-    echo -n "$artist - $track";
-  fi
+# tree — rough stand-in until `brew install tree`
+(( $+commands[tree] )) || tree() {
+  find "${1:-.}" -not -path '*/.git/*' |
+    sed -e 's/[^\/]*\//|--/g' -e 's/-- |/    |/g' |
+    ${PAGER:-less}
 }
 
+# --- dev servers and npm ------------------------------------------------------
 
-
-# get the name of the repo i am on
-zsh_show_git_repo_name() { 
-    gittopdir=$(git rev-parse --git-dir 2> /dev/null)
-    if [[ "foo$gittopdir" == "foo.git" ]]; then
-        echo `basename $(pwd)`
-    elif [[ "foo$gittopdir" != "foo" ]]; then
-        echo `dirname $gittopdir | xargs basename`
-    fi
+# port [n] — what's listening on TCP port n, or on every port if none given.
+# Shows your own processes; system services need `sudo lsof`.
+port() {
+  if (( ! $# )); then
+    lsof -nP -iTCP -sTCP:LISTEN
+    return
+  fi
+  [[ $1 == <1-65535> ]] || { print -u2 "usage: port [number]"; return 1 }
+  lsof -nP -iTCP:$1 -sTCP:LISTEN || { print -u2 "port: nothing of yours is listening on $1"; return 1 }
 }
 
+# killport <n> — stop whatever is listening on TCP port n: TERM first, then
+# KILL if it's still running 3 seconds later
+killport() {
+  [[ $1 == <1-65535> ]] || { print -u2 "usage: killport <number>"; return 1 }
+  local -aU pids=(${(f)"$(lsof -tiTCP:$1 -sTCP:LISTEN)"})
+  (( $#pids )) || { print -u2 "killport: nothing of yours is listening on $1"; return 1 }
 
+  local pid i
+  local -a alive
+  for pid in $pids; do
+    print -r -- "stopping ${$(ps -o comm= -p $pid):t} (pid $pid) on port $1"
+  done
+  kill $pids 2>/dev/null
 
-# show itunes current track
-zsh_show_itunes_track() {
-    #!/bin/bash
-
-    local state=`osascript -e 'tell application "iTunes" to player state as string'`;
-    if [[ $state == "playing" ]];
-        then
-            local symbol="\uf490"
-            artist=`osascript -e'tell application "iTunes"' -e'get artist of current track' -e'end tell'`;
-            title=`osascript -e'tell application "iTunes"' -e'get name of current track' -e'end tell'`;
-
-            echo -e "$symbol  $artist - $title"
-        else 
-            local symbol="\uf497"
-            echo "music is off $symbol"
-    fi 
+  for i in {1..30}; do
+    alive=()
+    for pid in $pids; do kill -0 $pid 2>/dev/null && alive+=($pid); done
+    (( $#alive )) || return 0
+    sleep 0.1
+  done
+  print -u2 "killport: pid $alive ignored TERM, sending KILL"
+  kill -KILL $alive 2>/dev/null
 }
 
-
-#intentet signal char
-zsh_show_internet_signal(){
-  #source on quality levels - http://www.wireless-nets.com/resources/tutorials/define_SNR_values.html
-  #source on signal levels  - http://www.speedguide.net/faq/how-to-read-rssisignal-and-snrnoise-ratings-440
-  local signal=$(airport -I | grep agrCtlRSSI | awk '{print $2}' | sed 's/-//g')
-  local noise=$(airport -I | grep agrCtlNoise | awk '{print $2}' | sed 's/-//g')
-  local SNR=$(bc <<<"scale=2; $signal / $noise")
-
-  local net=$(curl -D- -o /dev/null -s http://www.google.com | grep HTTP/1.1 | awk '{print $2}')
-  local color='%F{yellow}'
-  local symbol="\uf197"
-
-  # Excellent Signal (5 bars)
-  if [[ ! -z "${signal// }" ]] && [[ $SNR -gt .40 ]] ; 
-    then color='%F{021}' ; symbol="\uf1eb" ;
+# nr — list the scripts in the nearest package.json
+# nr <script> [args...] — run one with npm: `nr dev`, `nr test -- --watch`
+# Tab after `nr` completes script names.
+nr() {
+  if (( $# )); then
+    npm run "$@"
+    return
   fi
-
-  # Good Signal (3-4 bars)
-  if [[ ! -z "${signal// }" ]] && [[ ! $SNR -gt .40 ]] && [[ $SNR -gt .25 ]] ; 
-    then color='%F{021}' ; symbol="\uf1eb" ;
-  fi
-
-  # Low Signal (2 bars)
-  if [[ ! -z "${signal// }" ]] && [[ ! $SNR -gt .25 ]] && [[ $SNR -gt .15 ]] ; 
-    then color='%F{009}' ; symbol="\uf1eb" ;
-  fi
-
-  # Very Low Signal (1 bar)
-  if [[ ! -z "${signal// }" ]] && [[ ! $SNR -gt .15 ]] && [[ $SNR -gt .10 ]] ; 
-    then color='%F{009}' ; symbol="\uf1eb" ;
-  fi
-
-  # No Signal - No Internet
-  if [[ ! -z "${signal// }" ]] && [[ ! $SNR -gt .10 ]] ; 
-    then color='%F{009}' ; symbol="\uf011";
-  fi
-
-  if [[ -z "${signal// }" ]] && [[ "$net" -ne 200 ]] ; 
-    then color='%F{009}' ; symbol="\uf011" ;
-  fi
-
-  # Ethernet Connection (no wifi, hardline)
-  if [[ -z "${signal// }" ]] && [[ "$net" -eq 200 ]] ; 
-    then color='%F{021}' ; symbol="\uf197" ;
-  fi
-
-  echo -n "%{$color%}$symbol " # \f1eb is wifi bars
+  local pkg
+  pkg=$(_nr_package_json) || return 1
+  print -r -- "${(D)pkg}"
+  node -e '
+    const scripts = require(process.argv[1]).scripts || {};
+    const names = Object.keys(scripts);
+    if (!names.length) { console.error("nr: no scripts in this package.json"); process.exit(1); }
+    const width = Math.max(...names.map(n => n.length));
+    for (const n of names) console.log("  " + n.padEnd(width) + "  " + scripts[n]);
+  ' "$pkg"
 }
 
-
-
-# extract any time of compressed file
-function extract {
-    echo Extracting $1 ...
-    if [ -f $1 ] ; then
-        case $1 in
-            *.tar.bz2)   tar xjf $1  ;;
-            *.tar.gz)    tar xzf $1  ;;
-            *.bz2)       bunzip2 $1  ;;
-            *.rar)       rar x $1    ;;
-            *.gz)        gunzip $1   ;;
-            *.tar)       tar xf $1   ;;
-            *.tbz2)      tar xjf $1  ;;
-            *.tgz)       tar xzf $1  ;;
-            *.zip)       unzip $1   ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1  ;;
-            *)        echo "'$1' cannot be extracted via extract()" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
+# path of the nearest package.json, here or in a parent directory
+_nr_package_json() {
+  local dir=$PWD
+  until [[ -f $dir/package.json ]]; do
+    [[ $dir == / ]] && { print -u2 "nr: no package.json here or in any parent directory"; return 1 }
+    dir=${dir:h}
+  done
+  print -r -- "$dir/package.json"
 }
 
+# completion for nr: script names, with their commands as descriptions
+_nr() {
+  local pkg
+  pkg=$(_nr_package_json 2>/dev/null) || return 1
+  local -a scripts=(${(f)"$(node -e '
+    const scripts = require(process.argv[1]).scripts || {};
+    for (const [name, cmd] of Object.entries(scripts))
+      console.log(name.replace(/:/g, "\\:") + ":" + String(cmd).replace(/\s+/g, " "));
+  ' "$pkg" 2>/dev/null)"})
+  _describe -t scripts 'npm script' scripts
+}
+(( $+functions[compdef] )) && compdef _nr nr
 
+# --- network ------------------------------------------------------------------
 
-# diff char depenging on if git is dirty or clean
-function _prompt_char {
-  local STATUS=''
-  local FLAGS
-  FLAGS=('--porcelain')
-  if [[ "$(command git config --get oh-my-zsh.hide-dirty)" != "1" ]]; then
-    if [[ $POST_1_7_2_GIT -gt 0 ]]; then
-      FLAGS+='--ignore-submodules=dirty'
-    fi
-    if [[ "$DISABLE_UNTRACKED_FILES_DIRTY" == "true" ]]; then
-      FLAGS+='--untracked-files=no'
-    fi
-    STATUS=$(command git status ${FLAGS} 2> /dev/null | tail -n1)
-  fi
-  if [[ -n $STATUS ]]; then
-    echo "$GIT_DIRTY"
+# myip — local address of every active interface, then the public IP
+myip() {
+  ifconfig | awk '
+    /^[a-z0-9]+:/ { iface = substr($1, 1, length($1) - 1) }
+    $1 == "inet" && $2 != "127.0.0.1" {
+      tailscale = ($2 ~ /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\./) ? "  (tailscale)" : ""
+      printf "local   %-15s  %s%s\n", $2, iface, tailscale
+    }'
+  local public
+  if public=$(curl -fsS --max-time 5 https://api.ipify.org 2>/dev/null); then
+    print -r -- "public  $public"
   else
-    echo "$GIT_CLEAN"
+    print -u2 "myip: couldn't reach api.ipify.org for the public IP"
+    return 1
   fi
 }
 
+# --- terminal -----------------------------------------------------------------
 
-
-# get the name of the repo i am on
-_git_repo_name() { 
-    gittopdir=$(git rev-parse --git-dir 2> /dev/null)
-    if [[ "foo$gittopdir" == "foo.git" ]]; then
-        echo `basename $(pwd)`
-    elif [[ "foo$gittopdir" != "foo" ]]; then
-        echo `dirname $gittopdir | xargs basename`
-    fi
+# cls — clear the screen and the scrollback buffer
+cls() {
+  printf '\e[H\e[2J\e[3J'
 }
-
-
-
-function prompt_char {
-    git branch >/dev/null 2>/dev/null && echo "$GIT_DIRTY" && return
-    hg root >/dev/null 2>/dev/null && echo "$GIT_DIRTY" && return
-    echo "$GIT_CLEAN"
-}
-

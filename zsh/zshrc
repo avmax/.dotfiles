@@ -1,0 +1,45 @@
+# ~/.zshrc — interactive shells. Linked from <repo>/zsh/zshrc by install/zsh.sh.
+#
+# Load order matters: colors before completion (LS_COLORS), completion before
+# keybindings (menuselect keymap), the prompt before plugins, and plugins last —
+# zsh-syntax-highlighting has to wrap every widget defined before it.
+
+# Powerlevel10k only runs on a real terminal. Dumb terminals can't draw it, and
+# shells with no terminal at all — the `zsh -lic` that GUI apps and IDEs run to
+# read your environment — can't start its git helper, so it prints errors.
+[[ $TERM != dumb && -t 0 && -t 1 ]] && _zshrc_p10k=1
+
+# Powerlevel10k instant prompt: draws the prompt at once while the rest loads.
+# Keep it near the top — nothing above it may print or wait for input.
+if (( _zshrc_p10k )) && [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# This file's real directory, resolved through the ~/.zshrc symlink, so the
+# repo works from any path.
+ZSH_CONFIG_DIR="${${(%):-%x}:A:h}"
+ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+
+for _module in options colors completion aliases functions keybindings; do
+  source "$ZSH_CONFIG_DIR/$_module.zsh"
+done
+unset _module
+
+# Prompt: powerlevel10k. Its wizard (`p10k configure`, which also starts by
+# itself while p10k.zsh is missing) writes straight to zsh/p10k.zsh in this
+# repo. The instant-prompt block above and the `source` line below are what
+# the wizard checks for, so it never tries to rewrite this file.
+if (( _zshrc_p10k )) && [[ -r $ZSH_PLUGIN_DIR/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  POWERLEVEL9K_CONFIG_FILE="$ZSH_CONFIG_DIR/p10k.zsh"
+  source "$ZSH_PLUGIN_DIR/powerlevel10k/powerlevel10k.zsh-theme"
+  [[ ! -f $POWERLEVEL9K_CONFIG_FILE ]] || source "$POWERLEVEL9K_CONFIG_FILE"
+  # Prompt colors from colors.zsh, over the config's own. Only once a config
+  # exists: any POWERLEVEL9K_* setting stops the wizard from starting by itself.
+  [[ -f $POWERLEVEL9K_CONFIG_FILE ]] && apply_prompt_colors
+fi
+unset _zshrc_p10k
+
+source "$ZSH_CONFIG_DIR/plugins.zsh"
+
+# Machine-specific settings and secrets. Never tracked — see readme.md.
+[[ -r ~/.zshrc.local ]] && source ~/.zshrc.local

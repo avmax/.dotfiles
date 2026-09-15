@@ -1,6 +1,16 @@
+# macOS
 **/**/.DS_Store
 **/.DS_Store
 .DS_Store
+
+# downloaded installers (install/apps.sh)
 installers
+
+# vim plugins are fetched, not vendored
 vim/bundle/*
 !vim/bundle/.gitkeeper
+
+# local overrides must never be committed — only the .example is tracked
+*.local
+!*.local.example
+git/gitconfig.local

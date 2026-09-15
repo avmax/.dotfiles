@@ -1,49 +1,56 @@
+# Aliases, plus the app launchers. General-purpose functions live in functions.zsh.
+
+# navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias projects='cd ~/Code'
+
+# listing (colors come from CLICOLOR / LSCOLORS in options.zsh)
+alias ll='ls -lh'
+alias la='ls -lah'
+alias lr='ls -l'
+alias ld='ls -ld -- */'
+alias lh='ls -ld -- .?*'
+alias lf='find . -maxdepth 1 -type f'
+
+# removing: ask by default, opt out explicitly
+alias rm='nocorrect rm -i'
+alias rmf='nocorrect rm -f'
+alias rmrf='nocorrect rm -rf'
+
+alias grep='grep --color=auto'
+
 # apps
-alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl -a"
-alias mvim="open -a /Applications/MacVim.app/contents/MacOS/MacVim"
-alias telegram="open -a /Applications/Telegram.app/contents/MacOS/Telegram"
-alias skype="open -a /Applications/Skype.app/Contents/MacOS/Skype"
-alias safari="open -a /Applications/Safari.app/Contents/MacOS/Safari"
-alias canary="open -a /Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"
-alias firefox="open -a /Applications/FirefoxDeveloperEdition.app/Contents/MacOS/FirefoxDeveloperEdition"
-alias teamviewer="open -a /Applications/TeamViewer.app/Contents/MacOS/TeamViewer"
-alias pokerstars="open -a /Applications/PokerStars.app/Contents/MacOS/PokerStars"
-# alias chrome=="open -a \"Google Chrome\""
-alias ws="open -a /Applications/WebStorm.app/Contents/MacOS/webstorm"
-code () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* ;}
+#
+#   chrome                      open or bring Chrome to the front
+#   chrome example.com          -> https://example.com
+#   chrome localhost:5173       -> http://localhost:5173
+#   safari index.html           an existing file opens as a file
+#
+# Browsers are functions rather than aliases: a bare `open -a Safari example.com`
+# fails, because open looks for a *file* called example.com.
+_open_in() {  # _open_in <app> [url | domain | file]...
+  local app=$1 arg
+  local -a targets
+  shift
+  for arg in "$@"; do
+    if [[ -e $arg || $arg == *://* ]]; then
+      targets+=("$arg")
+    elif [[ $arg == (localhost|127.0.0.1|0.0.0.0)(|:*|/*) ]]; then
+      targets+=("http://$arg")
+    else
+      targets+=("https://$arg")
+    fi
+  done
+  open -a "$app" "${targets[@]}"
+}
+chrome()  { _open_in 'Google Chrome' "$@" }
+firefox() { _open_in Firefox "$@" }
+safari()  { _open_in Safari "$@" }
+alias telegram='open -a Telegram'
 
 # system
-alias off="sleep 1; xset dpms force off"
-alias reboot="sudo reboot"
+alias off='pmset displaysleepnow'   # screen off now
 
-# web
-
-# db
-alias mongodb="mongod --fork --logpath /data/db/mongodb.log"
-
-# grep
-alias grep="grep --color=auto"
-
-# dir jumping
-alias sandbox="cd ~/sandbox"
-alias projects="cd ~/sandbox/web/projects/"
-
-# show flies and dirs
-alias lr="ls -l"
-alias la="ls -la"
-alias ld="ls -ld */"
-alias lh="ls -ld .?*"
-alias lf="find . -maxdepth 1 -type f"
-
-# removing files and dirs
-alias del="rm -r -f"
-alias rm="nocorrect rm -i"
-alias rmf="nocorrect rm -f"
-alias rmrf="nocorrect rm -fR"
-
-# functions usage
-alias rainbow="spectrum_bls"
-
-# zsh
-alias szrc="source ~/.zshrc"
-
+# shell
+alias szrc='exec zsh'               # reload config in a fresh shell
