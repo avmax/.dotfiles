@@ -65,8 +65,12 @@ If anything goes wrong it stops with a `fail` line that says what; see
 
 ### iTerm2
 
+`./install.sh iTerm` does the colors and the rest of the profile for you — see
+[iTerm/readme.md](../iTerm/readme.md). By hand, or to check what it set:
+
 1. Settings → Profiles → Colors → Color Presets → **Solarized Light**.
-2. The prompt's icons need the **MesloLGS NF** font. Either:
+2. The prompt's icons need the **MesloLGS NF** font — the one part no installer
+   does, because macOS only registers fonts a user installs. Either:
    - download the four files from the powerlevel10k project —
      [Regular](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf),
      [Bold](https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf),

@@ -14,6 +14,7 @@ Every installer is **idempotent** (run it as often as you like) and
 | git    | ✅ `git/`      | ✅ `_install-scripts/git.sh` | modernized, requires git ≥ 2.38 |
 | zsh    | ✅ `zsh/`      | ✅ `_install-scripts/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
 | apps-and-tools | — | ✅ `_install-scripts/apps-and-tools.sh` | developer tools and desktop apps — see [Apps and tools](#apps-and-tools) |
+| iTerm  | ✅ `iTerm/`    | ✅ `_install-scripts/iTerm.sh` | iTerm2's profiles, key bindings and app settings — see [iTerm2](#iterm2) |
 | tmux   | ✅ `tmux/`     | ❌ | no installer yet |
 | vim    | ✅ `vim/`      | ❌ | no installer yet |
 | spectacle | ✅ `spectacle/` | ❌ | Spectacle is discontinued; see [Window management](#window-management) |
@@ -135,6 +136,35 @@ Solarized Light preset.
 - [zsh/readme.md](zsh/readme.md) — how the config is organized, aliases,
   functions, keys, colors, the prompt, and local settings
 
+## iTerm2
+
+```bash
+./install.sh iTerm
+```
+
+Imports `iTerm/com.googlecode.iterm2.plist` into the `com.googlecode.iterm2`
+defaults domain: the profile with its Solarized Light colors and MesloLGS NF
+font, the key and mouse bindings, and the app-wide settings. They apply the
+next time iTerm2 starts.
+
+**Quit iTerm2 first** (⌘Q) and run it from Terminal.app — iTerm2 writes its
+profiles back out when it quits, which would undo the import. The installer
+refuses to run rather than let that happen; `DRY_RUN=1` works either way.
+
+The font itself is not installed by this (see
+[zsh/install.md](zsh/install.md#4-set-up-the-terminal)); the installer warns if
+it is missing.
+
+Changed something in iTerm2's settings? Put it in the repo with:
+
+```bash
+./iTerm/export.sh
+git diff -- iTerm/
+```
+
+[iTerm/readme.md](iTerm/readme.md) — exactly what is captured, what is left out
+as machine-local, and how to roll back.
+
 ## Manual setup
 
 Things macOS does not let a script do reliably, or that are one-off.
@@ -169,13 +199,6 @@ brew install --cask rectangle
 
 Then Rectangle → Settings → *Import* → point it at
 `~/.dotfiles/spectacle/Shortcuts.json`.
-
-### iTerm2
-
-1. Settings → Profiles → Colors → *Color Presets* → **Solarized Light**
-2. Font: **MesloLGS NF**, for the prompt's icons — see
-   [zsh/install.md](zsh/install.md#4-set-up-the-terminal)
-3. Settings → Profiles → Text → Cursor: **Vertical Bar**
 
 ### VS Code
 
@@ -269,7 +292,8 @@ in the branch discussion; it is not set up yet.
 ├── _install-scripts/
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
-│   └── apps-and-tools.sh     developer tools and desktop apps
+│   ├── apps-and-tools.sh     developer tools and desktop apps
+│   └── iTerm.sh              iTerm2 topic installer
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
 │   └── gitignore_global      -> ~/.gitignore_global
@@ -281,6 +305,10 @@ in the branch discussion; it is not set up yet.
 │   ├── custom-functions.zsh  every function, shell and installer alike
 │   ├── *.zsh                 modules loaded by zshrc
 │   └── p10k.zsh              powerlevel10k settings, written by p10k configure
+├── iTerm/
+│   ├── readme.md             what is captured and how
+│   ├── com.googlecode.iterm2.plist   -> the com.googlecode.iterm2 defaults domain
+│   └── export.sh             update that file from this Mac's settings
 ├── tmux/ vim/                config, not yet migrated
 └── spectacle/                legacy window-manager shortcuts
 ```
