@@ -43,17 +43,17 @@ if [ "$#" -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 	exit 0
 fi
 
-for topic in "$@"; do
-	script="$ROOT/_install-scripts/$topic.sh"
+for script in "$@"; do
+	script_path="$ROOT/_install-scripts/$script.sh"
 
-	if [ ! -f "$script" ]; then
-		echo "no installer for '$topic'" >&2
+	if [ ! -f "$script_path" ]; then
+		echo "no installer for '$script'" >&2
 		echo >&2
 		usage >&2
 		exit 1
 	fi
 
-	echo "==> $topic"
-	bash "$script"
+	echo "==> $script"
+	bash "$script_path"
 	echo
 done
