@@ -264,7 +264,6 @@ in the branch discussion; it is not set up yet.
 .
 ├── index.sh                  entry point — ./index.sh <topic>
 ├── install/
-│   ├── custom-functions.sh   shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
 │   └── apps-and-tools.sh     developer tools and desktop apps
@@ -276,6 +275,7 @@ in the branch discussion; it is not set up yet.
 │   ├── install.md            how to install it
 │   ├── zprofile              -> ~/.zprofile
 │   ├── zshrc                 -> ~/.zshrc (loads the *.zsh modules)
+│   ├── custom-functions.zsh  every function, shell and installer alike
 │   ├── *.zsh                 modules loaded by zshrc
 │   └── p10k.zsh              powerlevel10k settings, written by p10k configure
 ├── tmux/ vim/                config, not yet migrated
@@ -291,7 +291,7 @@ in the branch discussion; it is not set up yet.
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/custom-functions.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/zsh/custom-functions.zsh"
 
 link_file "$DOTFILES_ROOT/<topic>/rc" "$HOME/.<topic>rc"
 

@@ -18,7 +18,7 @@ from this folder, in the order below.
 | `colors.zsh` | | every color: ls, completion lists, the command line, the prompt |
 | `completion.zsh` | | Tab completion |
 | `aliases.zsh` | | aliases and the browser launchers |
-| `functions.zsh` | | shell functions |
+| `custom-functions.zsh` | | every function: the shell functions below, plus the installers' helpers, which only bash loads |
 | `keybindings.zsh` | | keys for editing the command line |
 | `p10k.zsh` | | the prompt's layout, written by `p10k configure` |
 | `plugins.zsh` | | suggestions and syntax highlighting, loaded last |
@@ -85,6 +85,9 @@ After changing any of these files, open a new tab or run `exec zsh` (the
 
 `port` and `killport` only see your own processes; system services need
 `sudo lsof`. `myip` asks api.ipify.org for the public address.
+
+All of them are in `custom-functions.zsh`, which opens with a one-line
+summary of every function in it.
 
 ## Keys
 
