@@ -24,8 +24,12 @@
 	ui = auto
 
 [column]
-	# Multi-column output for `git branch`, `git tag`, etc. when it fits.
+	# Multi-column output for `git tag`, `git status` untracked files, etc.
+	# when it fits.
 	ui = auto
+	# ...but one branch per line: columns fill top-to-bottom, so a sorted
+	# list of long remote branch names becomes hard to scan.
+	branch = never
 
 [branch]
 	# Most recently worked-on branches first instead of alphabetical.
