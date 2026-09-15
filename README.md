@@ -32,8 +32,9 @@ of this file, in order.
 ```bash
 git clone git@github.com:avmax/.dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-./install.sh            # list topics
-./install.sh git        # install one
+./install.sh            # install every ready topic, in order
+./install.sh git        # install just one
+./install.sh -h         # list the topics
 ```
 
 The repo does not have to live in `~/.dotfiles` — every installer resolves
