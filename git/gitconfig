@@ -1,24 +1,124 @@
-[user]
-    name = avmax
-    email = avmax.web@gmail.com
-[core]
-    editor = vim
-	excludesfile = /Users/avmax/.gitignore_global
-[color]
-    ui = true
-[alias]
-    co = checkout
-    st = status
-    br = branch
+# ~/.dotfiles/git/gitconfig
+#
+# Symlinked to ~/.gitconfig by install/git.sh
+#
+# This file is TRACKED and PUBLIC. Anything machine-specific, private, or
+# per-client (work email, signing keys, proxies) belongs in ~/.gitconfig.local,
+# which is included at the bottom of this file and never committed.
+#
+# Requires git >= 2.38 (install/git.sh enforces this).
 
-    last = !"git hist -20"
-    hist = log --pretty=format:'(%Cred%h%C(reset) - %ar) [%Cred%cn%C(reset)] |%s|'
-    ancient = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[user]
+	name = avmax
+	email = avmax.web@gmail.com
+
+[core]
+	editor = vim
+	excludesfile = ~/.gitignore_global
+
+[init]
+	# git's own default is still "master" for backwards compatibility.
+	defaultBranch = main
+
+[color]
+	ui = auto
+
+[column]
+	# Multi-column output for `git branch`, `git tag`, etc. when it fits.
+	ui = auto
+
+[branch]
+	# Most recently worked-on branches first instead of alphabetical.
+	sort = -committerdate
+
+[tag]
+	# v1.10.0 sorts after v1.9.0, not before.
+	sort = version:refname
+
 [push]
 	default = simple
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Users/avmax/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+	# `git push` on a new branch sets up the upstream instead of erroring out.
+	autoSetupRemote = true
+	# Push annotated tags that point at pushed commits.
+	followTags = true
+
+[pull]
+	# Rebase instead of creating a merge commit on `git pull`.
+	rebase = true
+
+[fetch]
+	# Drop local refs for branches/tags deleted on the remote.
+	prune = true
+	pruneTags = true
+
+[rebase]
+	# Stash and restore dirty work automatically around a rebase.
+	autoStash = true
+	# Honour `commit --fixup` / `--squash` markers without passing -i.
+	autoSquash = true
+	# Rewrite dependent local branches when rebasing a stack.
+	updateRefs = true
+
+[merge]
+	# Conflict markers also show the common ancestor, and hoist shared
+	# lines out of the conflicting hunk. Far easier to resolve than the
+	# default "merge" style.
+	conflictstyle = zdiff3
+
+[diff]
+	# Produces noticeably more readable diffs than the default myers.
+	algorithm = histogram
+	# Colour moved lines differently from added/removed ones.
+	colorMoved = default
+	# i/ w/ c/ prefixes instead of a/ b/ so you can tell index from worktree.
+	mnemonicPrefix = true
+	renames = copies
+
+[rerere]
+	# Remember how a conflict was resolved and replay it next time.
+	enabled = true
+	autoupdate = true
+
+[help]
+	# Ask before running the command git thinks you meant.
+	autocorrect = prompt
+
+[commit]
+	# Show the staged diff in the commit message editor.
+	verbose = true
+
+[log]
+	date = iso
+
+[credential]
+	helper = osxkeychain
+
+[alias]
+	# --- navigation -------------------------------------------------------
+	co = checkout
+	sw = switch
+	br = branch
+	st = status -sb
+
+	# --- committing -------------------------------------------------------
+	ci = commit
+	cm = commit -m
+	amend = commit --amend --no-edit
+	unstage = restore --staged
+	undo = reset --soft HEAD~1
+	wip = !git add -A && git commit -m wip
+
+	# --- history ----------------------------------------------------------
+	hist = log --pretty=format:'(%Cred%h%C(reset) - %ar) [%Cred%cn%C(reset)] |%s|'
+	last = !git hist -20
+	graph = log --graph --oneline --decorate --all
+	ancient = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+	# --- introspection ----------------------------------------------------
+	aliases = !git config --get-regexp '^alias\\.' | sed 's/^alias\\.//' | sort
+	whoami = !git config user.name && git config user.email
+
+# Machine-specific overrides. Kept last so it wins over everything above.
+# Missing file is not an error, so this is safe on a fresh machine.
+[include]
+	path = ~/.gitconfig.local

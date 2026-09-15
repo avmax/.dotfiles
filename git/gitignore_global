@@ -1,0 +1,59 @@
+# ~/.dotfiles/git/gitignore_global
+#
+# Symlinked to ~/.gitignore_global by install/git.sh and wired up via
+# core.excludesfile in git/gitconfig.
+#
+# Only put things here that are noise on EVERY project — OS cruft and
+# personal tooling. Project-specific ignores belong in that project's
+# .gitignore so they work for everyone on the team.
+
+# --- macOS ------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.fseventsd
+Icon?
+
+# --- Linux / Windows (shared repos) -----------------------------------------
+*~
+.directory
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- vim --------------------------------------------------------------------
+*.swp
+*.swo
+*.swn
+.netrwhist
+Session.vim
+tags
+
+# --- JetBrains --------------------------------------------------------------
+.idea/
+*.iml
+
+# --- Sublime Text -----------------------------------------------------------
+*.sublime-workspace
+
+# NOTE: .vscode/ is deliberately NOT ignored globally — plenty of projects
+# commit a shared .vscode/settings.json or launch.json on purpose. Ignore it
+# per-project if you need to.
+
+# --- local env / agent scratch ----------------------------------------------
+.direnv/
+.envrc.local
+.env.local
+.claude/settings.local.json
+.aider*
+
+# --- generic local noise ----------------------------------------------------
+*.log
+*.pid
+.scratch/
