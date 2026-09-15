@@ -2,13 +2,14 @@
 #
 # Entry point for the dotfiles. Installs one or more topics.
 #
-#   ./index.sh                # show what's available
-#   ./index.sh git            # install just the git dotfiles
-#   ./index.sh git vim        # install several
-#   DRY_RUN=1 ./index.sh git  # preview, change nothing
+#   ./install.sh                # show what's available
+#   ./install.sh git            # install just the git dotfiles
+#   ./install.sh git vim        # install several
+#   DRY_RUN=1 ./install.sh git  # preview, change nothing
 #
-# Each topic is a script at install/<topic>.sh. Topics are independent and
-# idempotent — run one, run it again, run another, in any order.
+# Each topic is a script at _install-scripts/<topic>.sh. Topics are
+# independent and idempotent — run one, run it again, run another, in any
+# order.
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -23,7 +24,7 @@ PENDING=(tmux vim)
 
 usage() {
 	cat <<EOF
-usage: ./index.sh <topic> [<topic>...]
+usage: ./install.sh <topic> [<topic>...]
 
 ready:
 $(printf '  %s\n' "${READY[@]}")
@@ -43,7 +44,7 @@ if [ "$#" -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 for topic in "$@"; do
-	script="$ROOT/install/$topic.sh"
+	script="$ROOT/_install-scripts/$topic.sh"
 
 	if [ ! -f "$script" ]; then
 		echo "no installer for '$topic'" >&2

@@ -1,4 +1,5 @@
-# Line-editor plugins, cloned into ~/.local/share/zsh/plugins by install/zsh.sh.
+# Line-editor plugins, cloned into ~/.local/share/zsh/plugins by
+# _install-scripts/zsh.sh.
 # A missing plugin is skipped, so the shell still starts before the installer
 # has run. zshrc sources this file after the prompt: syntax highlighting has to
 # wrap every widget defined before it, powerlevel10k's included.

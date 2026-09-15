@@ -1,6 +1,6 @@
 # ~/.dotfiles/git/gitignore_global
 #
-# Symlinked to ~/.gitignore_global by install/git.sh and wired up via
+# Symlinked to ~/.gitignore_global by _install-scripts/git.sh and wired up via
 # core.excludesfile in git/gitconfig.
 #
 # Only put things here that are noise on EVERY project — OS cruft and

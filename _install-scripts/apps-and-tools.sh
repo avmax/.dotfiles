@@ -35,7 +35,7 @@
 # password. WireGuard needs an Apple Account signed in to the App Store.
 #
 # Safe to run repeatedly. Preview without touching anything:
-#   DRY_RUN=1 ./install/apps-and-tools.sh
+#   DRY_RUN=1 ./_install-scripts/apps-and-tools.sh
 
 set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/zsh/custom-functions.zsh"
@@ -161,7 +161,7 @@ else
 		/bin/bash -c "$installer" || fail "the Homebrew installer failed — see above"
 		find_brew || fail "the Homebrew installer finished, but brew isn't there"
 		ok "installed Homebrew"
-		info "skip Homebrew's \"Next steps\": zsh/zprofile puts brew on PATH (./index.sh zsh)"
+		info "skip Homebrew's \"Next steps\": zsh/zprofile puts brew on PATH (./install.sh zsh)"
 	fi
 fi
 

@@ -31,13 +31,13 @@ it is.
 See what it would do, without changing anything:
 
 ```bash
-DRY_RUN=1 ./index.sh zsh
+DRY_RUN=1 ./install.sh zsh
 ```
 
 Then install:
 
 ```bash
-./index.sh zsh
+./install.sh zsh
 ```
 
 It:
@@ -108,7 +108,7 @@ your history appears after the cursor.
 Run the installer again:
 
 ```bash
-cd ~/.dotfiles && ./index.sh zsh
+cd ~/.dotfiles && ./install.sh zsh
 ```
 
 It updates the plugins, leaves everything that's already in place alone, and

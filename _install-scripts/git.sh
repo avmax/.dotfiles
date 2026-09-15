@@ -6,7 +6,7 @@
 #   ~/.gitignore_global  -> symlink to <repo>/git/gitignore_global
 #
 # Safe to run repeatedly. Anything it would overwrite is backed up first.
-# Preview without touching anything:  DRY_RUN=1 ./install/git.sh
+# Preview without touching anything:  DRY_RUN=1 ./_install-scripts/git.sh
 
 set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/zsh/custom-functions.zsh"

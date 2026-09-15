@@ -1,4 +1,5 @@
-# ~/.zshrc — interactive shells. Linked from <repo>/zsh/zshrc by install/zsh.sh.
+# ~/.zshrc — interactive shells.
+# Linked from <repo>/zsh/zshrc by _install-scripts/zsh.sh.
 #
 # Load order matters: colors before completion (LS_COLORS), completion before
 # keybindings (menuselect keymap), the prompt before plugins, and plugins last —

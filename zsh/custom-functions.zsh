@@ -1,14 +1,15 @@
 # Custom functions: every shell function in this repo, in one file.
 #
-# zsh/zshrc loads it into interactive zsh; the installers in install/ source it
-# from bash. Each shell runs only its own part: bash stops at the `return` that
-# ends the installer helpers, and zsh skips that block. That keeps the helpers
-# out of your terminal (their `set -euo pipefail` would make it exit on the
-# first failing command, and `fail` would close the tab) and keeps bash away
-# from the zsh syntax further down.
+# zsh/zshrc loads it into interactive zsh; the installers in
+# _install-scripts/ source it from bash. Each shell runs only its own part:
+# bash stops at the `return` that ends the installer helpers, and zsh skips
+# that block. That keeps the helpers out of your terminal (their
+# `set -euo pipefail` would make it exit on the first failing command, and
+# `fail` would close the tab) and keeps bash away from the zsh syntax further
+# down.
 # After editing, check both:
 #
-#   zsh -n zsh/custom-functions.zsh && DRY_RUN=1 ./install/git.sh
+#   zsh -n zsh/custom-functions.zsh && DRY_RUN=1 ./_install-scripts/git.sh
 #
 # Shell functions (zsh)
 #
@@ -27,7 +28,8 @@
 #   _nr_package_json       path of the nearest package.json (used by nr)
 #   _nr                    Tab completion of script names for nr
 #
-# Installer helpers (bash, only when an install/*.sh script sources this file)
+# Installer helpers (bash, only when an _install-scripts/*.sh script sources
+# this file)
 #
 #   info <message>            print a progress line
 #   ok <message>              print a success line

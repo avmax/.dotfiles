@@ -1,12 +1,12 @@
 # ~/.dotfiles/git/gitconfig
 #
-# Symlinked to ~/.gitconfig by install/git.sh
+# Symlinked to ~/.gitconfig by _install-scripts/git.sh
 #
 # This file is TRACKED and PUBLIC. Anything machine-specific, private, or
 # per-client (work email, signing keys, proxies) belongs in ~/.gitconfig.local,
 # which is included at the bottom of this file and never committed.
 #
-# Requires git >= 2.38 (install/git.sh enforces this).
+# Requires git >= 2.38 (_install-scripts/git.sh enforces this).
 
 [user]
 	name = avmax

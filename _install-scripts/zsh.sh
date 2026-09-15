@@ -21,7 +21,7 @@
 # (where the 2019 config wrote history) to ~/.zsh_history.
 #
 # Safe to run repeatedly. Preview without touching anything:
-#   DRY_RUN=1 ./install/zsh.sh
+#   DRY_RUN=1 ./_install-scripts/zsh.sh
 
 set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/zsh/custom-functions.zsh"
