@@ -1,3 +1,12 @@
+# ---------------------------------------------------------------------------
+# LEGACY — not wired into ./index.sh any more.
+#
+# This script predates the per-topic installers in this directory. It is
+# destructive (rm -rf on your real dotfiles, no backups) and parts of it are
+# stale. Kept for reference only while zsh / tmux / vim are migrated to
+# install/<topic>.sh one at a time. Do not run it wholesale.
+# ---------------------------------------------------------------------------
+
 LOCAL_ROOT=~/.dotfiles/installers
 DOWNLOADS=~/Downloads
 APPLICATIONS=/Applications
