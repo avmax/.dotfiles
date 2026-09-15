@@ -13,6 +13,7 @@ Every installer is **idempotent** (run it as often as you like) and
 | ------ | -------------- | --------- | ----- |
 | git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
 | zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
+| downloads | — | ✅ `install/downloads.sh` | desktop apps — see [Applications](#applications) |
 | tmux   | ✅ `tmux/`     | ❌ | still in legacy `install/setup.sh` |
 | vim    | ✅ `vim/`      | ❌ | still in legacy `install/setup.sh` |
 | sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
@@ -186,40 +187,50 @@ is kept only as a reference.
 
 ## Applications
 
-Most of these are installable with Homebrew Cask, which is easier to keep
-current than downloading disk images by hand:
+```bash
+./index.sh downloads
+```
+
+Installs these, skipping any that are already in `/Applications` or
+`~/Applications` — however they got there:
+
+| app | from |
+| --- | ---- |
+| iTerm2 | Homebrew Cask `iterm2` |
+| Google Chrome | Homebrew Cask `google-chrome` |
+| Visual Studio Code | Homebrew Cask `visual-studio-code` |
+| Firefox | Homebrew Cask `firefox` |
+| Telegram | Homebrew Cask `telegram` |
+| AmneziaVPN | Homebrew Cask `amneziavpn` |
+| WireGuard | Mac App Store, with [mas](https://github.com/mas-cli/mas) — the only place WireGuard for macOS is released |
+
+**Requires [Homebrew](https://brew.sh)**, and for WireGuard an Apple Account
+signed in to the App Store. mas is installed with Homebrew the first time
+WireGuard is missing; if mas can't install it, the script opens WireGuard's
+App Store page instead. The AmneziaVPN installer and mas ask for your password.
+
+Each install is checked: if an app didn't land, the run ends with an error
+naming it. When a cask has been renamed, `brew search <app>` finds the new
+name.
+
+Everything else is installed by hand — most have a cask too
+(`brew search <app>`):
 
 | app | download |
 | --- | -------- |
 | Bitwarden | <https://bitwarden.com/> |
-| Telegram | <https://desktop.telegram.org/> |
-| Chrome / Chrome Canary | <https://www.google.com/chrome> |
-| Firefox | <https://www.mozilla.org/firefox/new/> |
+| Chrome Canary | <https://www.google.com/chrome/canary/> |
 | Tor Browser | <https://www.torproject.org/download/> |
 | Miro | <https://miro.com/apps/> |
 | Figma | <https://www.figma.com/downloads/> |
-| VS Code | <https://code.visualstudio.com/download> |
-| iTerm2 | <https://iterm2.com/downloads.html> |
 | Slack | <https://slack.com/downloads/mac> |
 | Notion | <https://www.notion.so/desktop> |
 | Docker Desktop | <https://www.docker.com/products/docker-desktop> |
 | Postman | <https://www.postman.com/downloads/> |
 | Rectangle | <https://rectangleapp.com/> |
 
-Cask names drift between releases, so look the current one up rather than
-trusting a hardcoded list:
-
-```bash
-brew search <app>
-brew install --cask <exact-cask-name>
-```
-
 A `Brewfile` would be the right way to pin all of this — see *Recommendations*
 in the branch discussion; it is not set up yet.
-
-`install/apps.sh` is an older, entirely commented-out attempt at scripting
-`.dmg`/`.zip` downloads. Homebrew Cask replaces it; the file is kept for
-reference.
 
 ## Repository layout
 
@@ -230,9 +241,8 @@ reference.
 │   ├── custom-functions.sh   shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
-│   ├── setup.sh              LEGACY — tmux/vim, destructive
-│   ├── download.sh           LEGACY — brew installs
-│   └── apps.sh               LEGACY — commented-out .dmg downloads
+│   ├── downloads.sh          desktop apps (Homebrew Cask, Mac App Store)
+│   └── setup.sh              LEGACY — tmux/vim, destructive
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
 │   ├── gitignore_global      -> ~/.gitignore_global
