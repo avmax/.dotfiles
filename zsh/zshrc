@@ -33,6 +33,9 @@ if (( _zshrc_p10k )) && [[ -r $ZSH_PLUGIN_DIR/powerlevel10k/powerlevel10k.zsh-th
   POWERLEVEL9K_CONFIG_FILE="$ZSH_CONFIG_DIR/p10k.zsh"
   source "$ZSH_PLUGIN_DIR/powerlevel10k/powerlevel10k.zsh-theme"
   [[ ! -f $POWERLEVEL9K_CONFIG_FILE ]] || source "$POWERLEVEL9K_CONFIG_FILE"
+  # Prompt colors from colors.zsh, over the config's own. Only once a config
+  # exists: any POWERLEVEL9K_* setting stops the wizard from starting by itself.
+  [[ -f $POWERLEVEL9K_CONFIG_FILE ]] && apply_prompt_colors
 fi
 unset _zshrc_p10k
 

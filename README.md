@@ -152,13 +152,13 @@ to the backup dir, and
 | ---- | -------- |
 | `zshrc` | loads the modules below, powerlevel10k with its instant prompt, then `~/.zshrc.local` |
 | `options.zsh` | `EDITOR`, `LESS`, history, directory options |
-| `colors.zsh` | every color except the prompt's: ls, completion lists, and the command line as you type — a Solarized Light scheme, with dangerous commands in red |
+| `colors.zsh` | every color, as one Solarized Light scheme: ls, completion lists, the command line as you type, and the prompt |
 | `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu |
 | `aliases.zsh` | `ll`/`la`, safe `rm`; `chrome`/`firefox`/`safari` (take a URL, bare domain or file), `telegram` |
 | `functions.zsh` | `up`, `mkcddir`, `gitroot`, `f`, `replace`, `extract`, `port`/`killport`, `nr` (Tab completes script names), `myip`, `cls` |
 | `keybindings.zsh` | every binding commented with its key and action; ↑/↓ search history by what's typed |
 | `plugins.zsh` | autosuggestions, then syntax highlighting — which must load last — plus two small highlighters: fade a mistyped command, darken quote marks |
-| `p10k.zsh` | powerlevel10k settings, written by `p10k configure` |
+| `p10k.zsh` | powerlevel10k settings, written by `p10k configure` (its colors are overridden by `colors.zsh`) |
 
 Secrets and per-machine settings go in `~/.zshrc.local`, never in the repo.
 Start a command with a space to keep it out of history.
@@ -171,6 +171,11 @@ starts by itself in every new terminal tab; `p10k configure` runs it again
 later. It writes its answers straight into `zsh/p10k.zsh` in this repo —
 commit that file. It won't offer to edit `~/.zshrc`: `zsh/zshrc` already has
 the instant-prompt block and the `source` line it looks for.
+
+The prompt's colors don't come from `zsh/p10k.zsh`: `apply_prompt_colors` in
+`zsh/colors.zsh` sets them right after it loads, so they survive re-running
+the wizard. After editing either file, open a new tab or run `exec zsh` —
+`p10k reload` only redraws from the settings already loaded.
 
 - **Font.** The icons need a Nerd Font. Run the wizard in iTerm2 and it
   offers to download *MesloLGS NF* and switch the iTerm2 profile to it.
