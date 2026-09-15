@@ -11,26 +11,28 @@ Every installer is **idempotent** (run it as often as you like) and
 
 | topic  | config in repo | installer | notes |
 | ------ | -------------- | --------- | ----- |
-| git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
-| zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
-| apps-and-tools | — | ✅ `install/apps-and-tools.sh` | developer tools and desktop apps — see [Apps and tools](#apps-and-tools) |
+| git    | ✅ `git/`      | ✅ `_install-scripts/git.sh` | modernized, requires git ≥ 2.38 |
+| zsh    | ✅ `zsh/`      | ✅ `_install-scripts/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
+| apps-and-tools | — | ✅ `_install-scripts/apps-and-tools.sh` | developer tools and desktop apps — see [Apps and tools](#apps-and-tools) |
 | tmux   | ✅ `tmux/`     | ❌ | no installer yet |
 | vim    | ✅ `vim/`      | ❌ | no installer yet |
-| sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
 | spectacle | ✅ `spectacle/` | ❌ | Spectacle is discontinued; see [Window management](#window-management) |
 
 Topics are migrated to the new installer contract one at a time. Until a topic
-has an `install/<topic>.sh`, set it up by hand. The old all-in-one
-`install/setup.sh` has been removed; its tmux and vim steps are still in git
-history (`git log -- install/setup.sh`).
+has an `_install-scripts/<topic>.sh`, set it up by hand. The old all-in-one
+setup script has been removed; its tmux and vim steps are still in git history
+(`git log -- install/setup.sh`, the path it had back then).
 
 ## Install
+
+Setting up a new Mac? Follow [install.md](install.md) — it's the short version
+of this file, in order.
 
 ```bash
 git clone git@github.com:avmax/.dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-./index.sh            # list topics
-./index.sh git        # install one
+./install.sh            # list topics
+./install.sh git        # install one
 ```
 
 The repo does not have to live in `~/.dotfiles` — every installer resolves
@@ -39,7 +41,7 @@ paths from its own location.
 ### Preview before changing anything
 
 ```bash
-DRY_RUN=1 ./index.sh git
+DRY_RUN=1 ./install.sh git
 ```
 
 Prints every `mv` / `ln` it would run and touches nothing.
@@ -55,7 +57,7 @@ Prints every `mv` / `ln` it would run and touches nothing.
 ## git
 
 ```bash
-./index.sh git
+./install.sh git
 ```
 
 Creates:
@@ -121,7 +123,7 @@ cp ~/.dotfiles-backup/<timestamp>/.gitconfig ~/.gitconfig
 ## zsh
 
 ```bash
-./index.sh zsh
+./install.sh zsh
 ```
 
 A plain zsh setup with no framework: a powerlevel10k prompt, fish-style
@@ -186,7 +188,7 @@ is kept only as a reference.
 ## Apps and tools
 
 ```bash
-./index.sh apps-and-tools
+./install.sh apps-and-tools
 ```
 
 Installs whatever is missing from two lists, and skips anything that's already
@@ -228,7 +230,7 @@ Good to know:
   script warns about it up front; the fix is in
   [zsh/install.md](zsh/install.md#homebrew-owned-by-another-account).
 - **Right after installing Homebrew**, skip its "Next steps": `zsh/zprofile`
-  already puts `brew` on `PATH` (`./index.sh zsh`).
+  already puts `brew` on `PATH` (`./install.sh zsh`).
 - **WireGuard** needs an Apple Account signed in to the App Store. mas is
   installed with Homebrew the first time WireGuard is missing; if mas can't
   install it, the script opens WireGuard's App Store page instead.
@@ -262,8 +264,9 @@ in the branch discussion; it is not set up yet.
 
 ```
 .
-├── index.sh                  entry point — ./index.sh <topic>
-├── install/
+├── install.sh                entry point — ./install.sh <topic>
+├── install.md                setting up a new Mac, step by step
+├── _install-scripts/
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
 │   └── apps-and-tools.sh     developer tools and desktop apps
@@ -279,14 +282,13 @@ in the branch discussion; it is not set up yet.
 │   ├── *.zsh                 modules loaded by zshrc
 │   └── p10k.zsh              powerlevel10k settings, written by p10k configure
 ├── tmux/ vim/                config, not yet migrated
-├── spectacle/                legacy window-manager shortcuts
-└── sublime/                  unmaintained
+└── spectacle/                legacy window-manager shortcuts
 ```
 
 ## Adding a topic
 
 1. Put the config in `<topic>/`.
-2. Write `install/<topic>.sh`:
+2. Write `_install-scripts/<topic>.sh`:
 
 ```bash
 #!/usr/bin/env bash
@@ -299,6 +301,6 @@ summary
 ok "<topic> dotfiles installed"
 ```
 
-3. Add the topic to `READY` in `index.sh` and to the status table above.
-4. Verify with `DRY_RUN=1 ./index.sh <topic>`, then run it twice — the second
+3. Add the topic to `READY` in `install.sh` and to the status table above.
+4. Verify with `DRY_RUN=1 ./install.sh <topic>`, then run it twice — the second
    run must report `already linked` and change nothing.
