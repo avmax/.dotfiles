@@ -7,7 +7,6 @@
 vim/bundle/*
 !vim/bundle/.gitkeeper
 
-# local overrides must never be committed — only the .example is tracked
+# local overrides must never be committed
 *.local
-!*.local.example
 git/gitconfig.local
