@@ -14,14 +14,15 @@ Every installer is **idempotent** (run it as often as you like) and
 | git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
 | zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
 | downloads | — | ✅ `install/downloads.sh` | desktop apps — see [Applications](#applications) |
-| tmux   | ✅ `tmux/`     | ❌ | still in legacy `install/setup.sh` |
-| vim    | ✅ `vim/`      | ❌ | still in legacy `install/setup.sh` |
+| tmux   | ✅ `tmux/`     | ❌ | no installer yet |
+| vim    | ✅ `vim/`      | ❌ | no installer yet |
 | sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
 | spectacle | ✅ `spectacle/` | ❌ | Spectacle is discontinued; see [Window management](#window-management) |
 
 Topics are migrated to the new installer contract one at a time. Until a topic
-has an `install/<topic>.sh`, its setup steps live in `install/setup.sh`, which
-is **legacy and destructive** — read it before running any of it by hand.
+has an `install/<topic>.sh`, set it up by hand. The old all-in-one
+`install/setup.sh` has been removed; its tmux and vim steps are still in git
+history (`git log -- install/setup.sh`).
 
 ## Install
 
@@ -241,8 +242,7 @@ in the branch discussion; it is not set up yet.
 │   ├── custom-functions.sh   shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
-│   ├── downloads.sh          desktop apps (Homebrew Cask, Mac App Store)
-│   └── setup.sh              LEGACY — tmux/vim, destructive
+│   └── downloads.sh          desktop apps (Homebrew Cask, Mac App Store)
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
 │   ├── gitignore_global      -> ~/.gitignore_global
