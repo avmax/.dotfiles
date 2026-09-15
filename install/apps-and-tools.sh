@@ -38,7 +38,7 @@
 #   DRY_RUN=1 ./install/apps-and-tools.sh
 
 set -euo pipefail
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/custom-functions.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/zsh/custom-functions.zsh"
 
 HOMEBREW_INSTALLER=https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
 POSTGRES=postgresql@18

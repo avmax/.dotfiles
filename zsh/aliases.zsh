@@ -1,4 +1,4 @@
-# Aliases, plus the app launchers. General-purpose functions live in functions.zsh.
+# Aliases, plus the app launchers. General-purpose functions live in custom-functions.zsh.
 
 # navigation
 alias ..='cd ..'
