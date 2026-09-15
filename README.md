@@ -227,7 +227,7 @@ reference.
 .
 ├── index.sh                  entry point — ./index.sh <topic>
 ├── install/
-│   ├── lib.sh                shared helpers (link_file, backups, DRY_RUN)
+│   ├── custom-functions.sh   shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
 │   ├── setup.sh              LEGACY — tmux/vim, destructive
@@ -257,7 +257,7 @@ reference.
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/custom-functions.sh"
 
 link_file "$DOTFILES_ROOT/<topic>/rc" "$HOME/.<topic>rc"
 

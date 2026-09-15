@@ -10,7 +10,7 @@
 # Preview without touching anything:  DRY_RUN=1 ./install/git.sh
 
 set -euo pipefail
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/custom-functions.sh"
 
 # git/gitconfig uses zdiff3, push.autoSetupRemote, rebase.updateRefs and
 # help.autocorrect=prompt. All of those land in 2.35–2.38; an older git
