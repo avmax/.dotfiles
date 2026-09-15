@@ -3,7 +3,7 @@
 # Shared helpers for the per-topic installers in this directory.
 # Source it, don't execute it:
 #
-#   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+#   . "$(dirname "${BASH_SOURCE[0]}")/custom-functions.sh"
 #
 # Contract for every installer that uses this:
 #   - idempotent: running it twice changes nothing the second time

@@ -24,7 +24,7 @@
 #   DRY_RUN=1 ./install/zsh.sh
 
 set -euo pipefail
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/custom-functions.sh"
 
 PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
 PLUGINS=(
