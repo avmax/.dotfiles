@@ -64,7 +64,6 @@ Creates:
 | ---- | ---- | ------ |
 | `~/.gitconfig` | symlink | `git/gitconfig` |
 | `~/.gitignore_global` | symlink | `git/gitignore_global` |
-| `~/.gitconfig.local` | copy, once | `git/gitconfig.local.example` |
 
 **Requires git ≥ 2.38.** The config uses `merge.conflictstyle=zdiff3`,
 `push.autoSetupRemote`, `rebase.updateRefs` and `help.autocorrect=prompt`;
@@ -85,16 +84,14 @@ installed but `git --version` still shows an Apple build, your `PATH` has
 `git/gitconfig` is tracked and this repo is public, so it holds only the
 personal identity that is already public on GitHub. Everything
 machine-specific goes in `~/.gitconfig.local`, which is never tracked and is
-`include`d last so it wins:
+`include`d last so it wins. The installer does not create it; make it by hand
+when a machine needs one (git skips the include if it is missing):
 
 ```ini
 # ~/.gitconfig.local
 [user]
 	email = me@work.example
 ```
-
-See `git/gitconfig.local.example` for per-directory identities
-(`includeIf "gitdir:"`) and ssh commit signing.
 
 ### What the config sets
 
@@ -273,8 +270,7 @@ in the branch discussion; it is not set up yet.
 │   └── apps-and-tools.sh     developer tools and desktop apps
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
-│   ├── gitignore_global      -> ~/.gitignore_global
-│   └── gitconfig.local.example
+│   └── gitignore_global      -> ~/.gitignore_global
 ├── zsh/
 │   ├── readme.md             how the zsh setup works
 │   ├── install.md            how to install it

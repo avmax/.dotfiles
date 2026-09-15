@@ -4,7 +4,6 @@
 #
 #   ~/.gitconfig         -> symlink to <repo>/git/gitconfig
 #   ~/.gitignore_global  -> symlink to <repo>/git/gitignore_global
-#   ~/.gitconfig.local   -> copy of <repo>/git/gitconfig.local.example (once)
 #
 # Safe to run repeatedly. Anything it would overwrite is backed up first.
 # Preview without touching anything:  DRY_RUN=1 ./install/git.sh
@@ -30,7 +29,6 @@ ok "git $GIT_VERSION"
 info "linking git config"
 link_file "$DOTFILES_ROOT/git/gitconfig"        "$HOME/.gitconfig"
 link_file "$DOTFILES_ROOT/git/gitignore_global" "$HOME/.gitignore_global"
-copy_once "$DOTFILES_ROOT/git/gitconfig.local.example" "$HOME/.gitconfig.local"
 
 if [ "$DRY_RUN" != "1" ]; then
 	info "verifying git accepts the config"
