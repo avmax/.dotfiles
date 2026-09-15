@@ -3,9 +3,6 @@
 **/.DS_Store
 .DS_Store
 
-# downloaded installers (install/apps.sh)
-installers
-
 # vim plugins are fetched, not vendored
 vim/bundle/*
 !vim/bundle/.gitkeeper
