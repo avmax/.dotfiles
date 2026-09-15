@@ -1,0 +1,105 @@
+# Colors for everything except the prompt (that's p10k.zsh): ls, completion
+# lists, and the command line as you type. Tuned for iTerm's Solarized Light
+# preset (background #fdf6e3, text #657b83). Sourced before completion and the
+# plugins, which keep whatever is set here and fill in the rest with defaults.
+#
+# Hex colors need 24-bit color. iTerm2, VS Code and Cursor have it and say so
+# in $COLORTERM; anywhere else zsh/nearcolor swaps each hex color for the
+# closest of the standard 256.
+[[ $COLORTERM == (truecolor|24bit) ]] || zmodload zsh/nearcolor
+
+# --- ls and completion lists --------------------------------------------------
+
+# BSD ls reads CLICOLOR/LSCOLORS; LS_COLORS feeds the completion lists.
+export CLICOLOR=1
+export LSCOLORS="exgxexexbxfxexexexfxfx"
+export LS_COLORS="di=34:ln=36:so=34:pi=34:ex=31:bd=35:cd=34:su=34:sg=34:tw=35:ow=35"
+
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:descriptions' format '%F{blue}%d%f'
+zstyle ':completion:*:messages' format '%F{red}%d%f'
+zstyle ':completion:*:warnings' format '%F{red}no matches for: %d%f'
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=34'
+
+# --- the command line ---------------------------------------------------------
+#
+#   #449630  a command that exists, and everything typed after it
+#   #3fad1e  your aliases and functions: a brighter shade of that green, bold
+#   #87a181  a command that doesn't exist, and everything after it: faded green
+#   #0068a7  a file or folder that exists; #5b92bf while you're still typing it
+#   #7d7a75  text in quotes; #302d29 the quote marks themselves
+#   violet   brackets, darkest outermost
+#   #dc322f  dangerous commands
+#   #657b83  the suggestion after the cursor: the terminal's plain text color
+#
+# Two of these aren't plain settings — fading everything after a mistyped
+# command, and darker quote marks. The `typo` and `quotes` highlighters in
+# plugins.zsh paint those, using the styles defined here.
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#657b83'
+
+typeset -gA ZSH_HIGHLIGHT_STYLES ZSH_HIGHLIGHT_REGEXP
+
+# a command that exists, and what you type after it
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=#449630'                     # programs, and builtins like cd
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=#449630,underline'     # runs the next word: sudo, exec, time
+ZSH_HIGHLIGHT_STYLES[autodirectory]='fg=#449630,underline'  # a directory typed as a command
+ZSH_HIGHLIGHT_STYLES[suffix-alias]='fg=#449630,underline'
+ZSH_HIGHLIGHT_STYLES[default]='fg=#449630'                  # plain arguments: status, origin
+ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=#449630'     # -m
+ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=#449630'     # --force
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#449630'                 # *.txt (blue by default, like a path)
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=#449630'        # !!
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=#449630'              # > out.txt
+
+# your aliases and functions
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#3fad1e,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=#3fad1e,bold'
+
+# a command that doesn't exist (the typo highlighter fades the rest with it)
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#87a181'
+
+# files and folders
+ZSH_HIGHLIGHT_STYLES[path]='fg=#0068a7,underline'
+ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=#5b92bf,underline'    # a path you're still typing
+
+# text in quotes, and the quote marks (painted by the quotes highlighter)
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#7d7a75'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#7d7a75'
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=#7d7a75'
+ZSH_HIGHLIGHT_STYLES[quote-mark]='fg=#302d29'
+
+# brackets, by nesting depth: violet, darkest outermost
+ZSH_HIGHLIGHT_STYLES[bracket-level-1]='fg=#462f80,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-2]='fg=#5c42a3,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-3]='fg=#725abd,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-4]='fg=#8671cf,bold'
+ZSH_HIGHLIGHT_STYLES[bracket-level-5]='fg=#9787d9,bold'
+
+ZSH_HIGHLIGHT_STYLES[cursor]='bg=008'                        # the character under the cursor
+
+# Dangerous commands: the whole command in #dc322f. Matched only where a
+# command starts — line start, or after ; & | ( { — so `git add` isn't taken
+# for `dd`, nor `echo sudo` for sudo. Add your own to the list.
+() {
+  local at='(^|[;&|({][[:space:]]*)((command|exec|nocorrect|noglob|time)[[:space:]]+)*'
+  local rest='([[:space:]].*|$)'
+  local -a dangerous=(
+    "sudo$rest"                                                                  # runs as root
+    "rm[[:space:]]+(-[[:alnum:]]*[rRf][[:alnum:]]*|--recursive|--force)$rest"    # rm -r, rm -f
+    "(rmf|rmrf)$rest"                                                            # the rm -f aliases
+    "git[[:space:]]+push([[:space:]].*)?[[:space:]](-f|--force[[:alnum:]-]*)$rest"
+    "git[[:space:]]+reset([[:space:]].*)?[[:space:]]--hard$rest"
+    "git[[:space:]]+clean([[:space:]].*)?[[:space:]]-[[:alnum:]]*f[[:alnum:]]*$rest"
+    "git[[:space:]]+branch([[:space:]].*)?[[:space:]]-D$rest"
+    "git[[:space:]]+(checkout|restore)[[:space:]]+(--[[:space:]]+)?\\.$rest"     # discard all changes
+    "(chmod|chown)[[:space:]]+(.*[[:space:]])?-[[:alnum:]]*R[[:alnum:]]*$rest"   # recursive
+    "(dd|mkfs[[:alnum:]._]*|newfs[[:alnum:]._]*)$rest"                           # raw disk writes
+    "diskutil[[:space:]]+(erase[[:alnum:]]*|zeroDisk|randomDisk|secureErase|partitionDisk)$rest"
+    "(shutdown|reboot|halt)$rest"
+  )
+  local re
+  for re in $dangerous; do
+    ZSH_HIGHLIGHT_REGEXP[$at$re]='fg=#dc322f,bold'
+  done
+}

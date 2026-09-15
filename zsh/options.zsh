@@ -6,11 +6,6 @@ export VISUAL="$EDITOR"
 export PAGER=less
 export LESS='-FRi'   # quit if it fits one screen, keep colors, smart-case search
 
-# BSD ls reads CLICOLOR/LSCOLORS; LS_COLORS feeds completion list colors.
-export CLICOLOR=1
-export LSCOLORS="exgxexexbxfxexexexfxfx"
-export LS_COLORS="di=34:ln=36:so=34:pi=34:ex=31:bd=35:cd=34:su=34:sg=34:tw=35:ow=35"
-
 # history — ~/.zsh_history is the file macOS and the old setup both used
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=50000

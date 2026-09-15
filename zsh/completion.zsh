@@ -58,20 +58,15 @@ zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/compcache"
 zstyle ':completion:*' completer _expand _complete _ignored _approximate
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive
 zstyle ':completion:*' menu select=2                        # arrow-key menu past 2 matches
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# group matches under colored headings
+# group matches under headings (list and heading colors are in colors.zsh)
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format '%F{blue}%d%f'
-zstyle ':completion:*:messages' format '%F{red}%d%f'
-zstyle ':completion:*:warnings' format '%F{red}no matches for: %d%f'
 zstyle ':completion:*:manuals' separate-sections true
 
 # kill / killall: pick from your own processes in a menu
 zstyle ':completion:*:processes' command "ps -u $USER -o pid,user,comm"
 zstyle ':completion:*:*:kill:*' menu yes select
 zstyle ':completion:*:*:kill:*' force-list always
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=34'
 zstyle ':completion:*:*:killall:*' menu yes select
 zstyle ':completion:*:*:killall:*' force-list always

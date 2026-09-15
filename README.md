@@ -151,12 +151,13 @@ to the backup dir, and
 | file | contents |
 | ---- | -------- |
 | `zshrc` | loads the modules below, powerlevel10k with its instant prompt, then `~/.zshrc.local` |
-| `options.zsh` | `EDITOR`, `LESS`, ls colors, history, directory options |
-| `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu and colors |
+| `options.zsh` | `EDITOR`, `LESS`, history, directory options |
+| `colors.zsh` | every color except the prompt's: ls, completion lists, and the command line as you type — a Solarized Light scheme, with dangerous commands in red |
+| `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu |
 | `aliases.zsh` | `ll`/`la`, safe `rm`; `chrome`/`firefox`/`safari` (take a URL, bare domain or file), `telegram` |
 | `functions.zsh` | `up`, `mkcddir`, `gitroot`, `f`, `replace`, `extract`, `port`/`killport`, `nr` (Tab completes script names), `myip`, `cls` |
 | `keybindings.zsh` | every binding commented with its key and action; ↑/↓ search history by what's typed |
-| `plugins.zsh` | autosuggestions, then syntax highlighting — which must load last |
+| `plugins.zsh` | autosuggestions, then syntax highlighting — which must load last — plus two small highlighters: fade a mistyped command, darken quote marks |
 | `p10k.zsh` | powerlevel10k settings, written by `p10k configure` |
 
 Secrets and per-machine settings go in `~/.zshrc.local`, never in the repo.
