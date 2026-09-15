@@ -35,7 +35,7 @@
 # password. WireGuard needs an Apple Account signed in to the App Store.
 #
 # Safe to run repeatedly. Preview without touching anything:
-#   DRY_RUN=1 ./install/downloads.sh
+#   DRY_RUN=1 ./install/apps-and-tools.sh
 
 set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/custom-functions.sh"

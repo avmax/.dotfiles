@@ -13,7 +13,7 @@ Every installer is **idempotent** (run it as often as you like) and
 | ------ | -------------- | --------- | ----- |
 | git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
 | zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
-| downloads | — | ✅ `install/downloads.sh` | developer tools and desktop apps — see [Tools and apps](#tools-and-apps) |
+| apps-and-tools | — | ✅ `install/apps-and-tools.sh` | developer tools and desktop apps — see [Apps and tools](#apps-and-tools) |
 | tmux   | ✅ `tmux/`     | ❌ | no installer yet |
 | vim    | ✅ `vim/`      | ❌ | no installer yet |
 | sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
@@ -186,10 +186,10 @@ account menu in the bottom-left. The old
 [settings gist](https://gist.github.com/avmax/4296510c21aeee0ab94684d3d3bc61c2)
 is kept only as a reference.
 
-## Tools and apps
+## Apps and tools
 
 ```bash
-./index.sh downloads
+./index.sh apps-and-tools
 ```
 
 Installs whatever is missing from two lists, and skips anything that's already
@@ -270,7 +270,7 @@ in the branch discussion; it is not set up yet.
 │   ├── custom-functions.sh   shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
-│   └── downloads.sh          developer tools and desktop apps
+│   └── apps-and-tools.sh     developer tools and desktop apps
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
 │   ├── gitignore_global      -> ~/.gitignore_global
