@@ -37,9 +37,10 @@ ok()   { printf '%s  ok%s %s\n' "$_C_GREEN"  "$_C_OFF" "$*"; }
 warn() { printf '%swarn%s %s\n' "$_C_YELLOW" "$_C_OFF" "$*" >&2; }
 fail() { printf '%sfail%s %s\n' "$_C_RED"    "$_C_OFF" "$*" >&2; exit 1; }
 
-# pretty <path> — shorten $HOME to ~ for readable output. The tilde must be
-# escaped, or bash tilde-expands the replacement back into $HOME.
-pretty() { printf '%s' "${1/#"$HOME"/\~}"; }
+# pretty <path> — shorten $HOME to ~ for readable output. The tilde goes in
+# through a variable: a literal ~ is tilde-expanded back into $HOME, and the
+# escaped \~ form prints its backslash on macOS's bash 3.2.
+pretty() { local tilde='~'; printf '%s' "${1/#"$HOME"/$tilde}"; }
 
 # run <cmd> [args...] — executes, or just prints under DRY_RUN=1.
 run() {
@@ -48,6 +49,22 @@ run() {
 	else
 		"$@"
 	fi
+}
+
+# backup_path <path> — move a file, directory or symlink into $BACKUP_DIR.
+# Does nothing if the path doesn't exist. This is how installers retire
+# anything: nothing is ever deleted.
+backup_path() {
+	local target="$1"
+
+	[ -e "$target" ] || [ -L "$target" ] || return 0
+
+	if [ "$_DOTFILES_DID_BACKUP" = "0" ]; then
+		run mkdir -p "$BACKUP_DIR"
+		_DOTFILES_DID_BACKUP=1
+	fi
+	info "backing up $(pretty "$target") -> $(pretty "$BACKUP_DIR")/"
+	run mv "$target" "$BACKUP_DIR/$(basename "$target")"
 }
 
 # link_file <source-in-repo> <target-path>
@@ -65,12 +82,7 @@ link_file() {
 		return 0
 	fi
 
-	if [ -e "$dst" ] || [ -L "$dst" ]; then
-		run mkdir -p "$BACKUP_DIR"
-		_DOTFILES_DID_BACKUP=1
-		info "backing up $(pretty "$dst") -> $(pretty "$BACKUP_DIR")/"
-		run mv "$dst" "$BACKUP_DIR/$(basename "$dst")"
-	fi
+	backup_path "$dst"
 
 	run mkdir -p "$(dirname "$dst")"
 	run ln -sfn "$src" "$dst"
