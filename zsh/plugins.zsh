@@ -1,21 +1,13 @@
-# Prompt and line-editor add-ons, all installed by install/zsh.sh:
-#
-#   starship                 prompt; layout in ~/.config/starship.toml
-#   zsh-autosuggestions      ~/.local/share/zsh/plugins
-#   zsh-syntax-highlighting  ~/.local/share/zsh/plugins
-#
-# Anything missing is skipped, so the shell still starts before the installer
-# has run. zshrc sources this file last: syntax highlighting has to wrap every
-# widget defined before it, starship's included.
+# Line-editor plugins, cloned into ~/.local/share/zsh/plugins by install/zsh.sh.
+# A missing plugin is skipped, so the shell still starts before the installer
+# has run. zshrc sources this file after the prompt: syntax highlighting has to
+# wrap every widget defined before it, powerlevel10k's included.
 
-# All three draw with escape codes. Under TERM=dumb (IDE task runners, Emacs
-# shell) they can't — starship even prints an error — so skip them.
+# Both redraw the command line with escape codes, which a dumb terminal (IDE
+# task runners, Emacs shell) can't show.
 [[ $TERM == dumb ]] && return
 
-ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
-
-# prompt
-(( $+commands[starship] )) && eval "$(starship init zsh)"
+: ${ZSH_PLUGIN_DIR:=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins}
 
 # fish-style suggestions as you type; → or End accepts
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)

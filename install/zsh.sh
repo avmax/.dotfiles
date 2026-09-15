@@ -5,18 +5,18 @@
 #   ~/.zprofile     -> symlink to <repo>/zsh/zprofile   login shells: PATH, Homebrew
 #   ~/.zshrc        -> symlink to <repo>/zsh/zshrc      interactive shells
 #   ~/.zshrc.local  -> copy of <repo>/zsh/zshrc.local.example (once, mode 600)
-#   ~/.config/starship.toml -> symlink to <repo>/zsh/starship.toml  prompt layout
 #
-# plus what the config uses:
+# plus the plugins the config loads, cloned into ~/.local/share/zsh/plugins and
+# updated on every run:
 #
-#   plugins    zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions,
-#              cloned into ~/.local/share/zsh/plugins and updated on every run
-#   starship   the prompt — via Homebrew when this user can write to it,
-#              otherwise the official release binary in ~/.local/bin
+#   powerlevel10k            the prompt; `p10k configure` writes <repo>/zsh/p10k.zsh
+#   zsh-autosuggestions
+#   zsh-syntax-highlighting
+#   zsh-completions
 #
-# It also retires the 2019 setup: ~/.oh-my-zsh and stale ~/.zcompdump* files
-# move to the backup dir, and ~/.zhistory (where that config wrote history) is
-# appended to ~/.zsh_history first.
+# It also retires earlier setups by moving them to the backup dir — ~/.oh-my-zsh,
+# the Starship prompt, stale ~/.zcompdump* files — and appends ~/.zhistory
+# (where the 2019 config wrote history) to ~/.zsh_history.
 #
 # Safe to run repeatedly. Preview without touching anything:
 #   DRY_RUN=1 ./install/zsh.sh
@@ -25,28 +25,32 @@ set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/lib.sh"
 
 PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
-BIN_DIR="$HOME/.local/bin"
 PLUGINS=(
+	romkatv/powerlevel10k
 	zsh-users/zsh-autosuggestions
 	zsh-users/zsh-syntax-highlighting
 	zsh-users/zsh-completions
 )
 
-WORK="$(mktemp -d)"
-trap 'rm -rf "$WORK"' EXIT
-
 require_cmd zsh "macOS ships it at /bin/zsh."
 require_cmd git
-require_cmd curl
 ok "$(zsh --version)"
 
-# --- retire the oh-my-zsh setup -----------------------------------------------
+# --- retire earlier setups ----------------------------------------------------
 
-info "retiring the old setup"
+info "retiring earlier setups"
 backup_path "$HOME/.oh-my-zsh"
 for dump in "$HOME"/.zcompdump*; do
 	backup_path "$dump"   # completion now caches in ~/.cache/zsh
 done
+
+# Starship was the prompt before powerlevel10k. Only what this installer put
+# there: the config symlink into this repo and the release binary.
+starship_link="$HOME/.config/starship.toml"
+if [ -L "$starship_link" ] && [[ "$(readlink "$starship_link")" == "$DOTFILES_ROOT"/* ]]; then
+	backup_path "$starship_link"
+fi
+backup_path "$HOME/.local/bin/starship"
 
 if [ -f "$HOME/.zhistory" ]; then
 	info "appending ~/.zhistory to ~/.zsh_history"
@@ -63,7 +67,6 @@ fi
 info "linking zsh config"
 link_file "$DOTFILES_ROOT/zsh/zprofile" "$HOME/.zprofile"
 link_file "$DOTFILES_ROOT/zsh/zshrc"    "$HOME/.zshrc"
-link_file "$DOTFILES_ROOT/zsh/starship.toml" "$HOME/.config/starship.toml"
 copy_once "$DOTFILES_ROOT/zsh/zshrc.local.example" "$HOME/.zshrc.local"
 if [ -f "$HOME/.zshrc.local" ]; then
 	run chmod 600 "$HOME/.zshrc.local"   # it's where secrets go
@@ -87,14 +90,16 @@ for repo in "${PLUGINS[@]}"; do
 			run git -C "$dest" pull --ff-only --quiet
 			continue
 		fi
-		before="$(git -C "$dest" rev-parse --short HEAD)"
+		# Compare full hashes: --short can grow a digit after a fetch and make
+		# the same commit look different.
+		before="$(git -C "$dest" rev-parse HEAD)"
 		git -C "$dest" pull --ff-only --quiet \
 			|| fail "could not update $(pretty "$dest") — local changes? Move it away and re-run."
-		after="$(git -C "$dest" rev-parse --short HEAD)"
+		after="$(git -C "$dest" rev-parse HEAD)"
 		if [ "$before" = "$after" ]; then
-			ok "up to date: $name ($after)"
+			ok "up to date: $name (${after:0:7})"
 		else
-			ok "updated $name $before -> $after"
+			ok "updated $name ${before:0:7} -> ${after:0:7}"
 		fi
 	else
 		backup_path "$dest"   # something that isn't a clone is in the way
@@ -104,53 +109,15 @@ for repo in "${PLUGINS[@]}"; do
 	fi
 done
 
-# --- starship -----------------------------------------------------------------
-
-# Official release binary, checked against the .sha256 published beside it.
-install_starship_binary() {
-	local arch asset url want have
-
-	case "$(uname -m)" in
-		arm64)  arch=aarch64 ;;
-		x86_64) arch=x86_64 ;;
-		*)      fail "no starship build for $(uname -m) — see https://starship.rs" ;;
-	esac
-	asset="starship-$arch-apple-darwin.tar.gz"
-	url="https://github.com/starship/starship/releases/latest/download/$asset"
-
-	if [ "$DRY_RUN" = "1" ]; then
-		run curl -fsSL -o "$asset" "$url"
-		run install -m 0755 starship "$BIN_DIR/starship"
-		return 0
-	fi
-
-	curl -fsSL --retry 2 -o "$WORK/$asset" "$url" \
-		|| fail "download failed: $url"
-	curl -fsSL --retry 2 -o "$WORK/$asset.sha256" "$url.sha256" \
-		|| fail "download failed: $url.sha256"
-
-	want="$(awk '{print $1}' "$WORK/$asset.sha256")"
-	have="$(shasum -a 256 "$WORK/$asset" | awk '{print $1}')"
-	[ "$want" = "$have" ] || fail "checksum mismatch for $asset (expected $want, got $have)"
-
-	tar -xzf "$WORK/$asset" -C "$WORK" starship
-	mkdir -p "$BIN_DIR"
-	install -m 0755 "$WORK/starship" "$BIN_DIR/starship"
-	ok "installed $("$BIN_DIR/starship" --version | head -n1) to $(pretty "$BIN_DIR")"
-}
-
-info "starship prompt"
-export PATH="$BIN_DIR:$PATH"
-if command -v starship >/dev/null 2>&1; then
-	ok "already installed: $(starship --version | head -n1) ($(pretty "$(command -v starship)"))"
-elif command -v brew >/dev/null 2>&1 && [ -w "$(brew --prefix)" ]; then
-	run brew install starship
-	ok "installed starship with Homebrew"
+# powerlevel10k shows git status through gitstatusd, a small binary it would
+# otherwise download the first time a prompt appears inside a git repo.
+info "gitstatusd for powerlevel10k"
+if [ "$DRY_RUN" = "1" ]; then
+	run /bin/sh "$PLUGIN_DIR/powerlevel10k/gitstatus/install"
 else
-	if command -v brew >/dev/null 2>&1; then
-		warn "$(brew --prefix) is not writable by $(id -un), so Homebrew can't install — using the release binary (see README → zsh → Homebrew)"
-	fi
-	install_starship_binary
+	/bin/sh "$PLUGIN_DIR/powerlevel10k/gitstatus/install" </dev/null >/dev/null \
+		|| fail "could not download gitstatusd — check the network and re-run"
+	ok "gitstatusd ready in $(pretty "${XDG_CACHE_HOME:-$HOME/.cache}/gitstatus")"
 fi
 
 # --- verify -------------------------------------------------------------------
@@ -163,30 +130,39 @@ if [ "$DRY_RUN" != "1" ]; then
 	done
 	ok "config parses"
 
-	# Start a login + interactive shell the way a new terminal tab does, with a
-	# clean environment, and fail on anything it prints to stderr. TERM is
-	# pinned to what iTerm / VS Code set, not inherited: this script may itself
-	# be running under TERM=dumb, where the prompt is deliberately skipped.
-	clean_zsh() {
-		env -i HOME="$HOME" USER="${USER:-$(id -un)}" LOGNAME="${LOGNAME:-$(id -un)}" \
-			SHELL=/bin/zsh TERM=xterm-256color \
-			zsh -lic "$1"
-	}
+	# Start login + interactive shells the way a new terminal tab does, with a
+	# clean environment. TERM is pinned to what iTerm / VS Code set rather than
+	# inherited, since this script may itself run under TERM=dumb. No prompt is
+	# drawn under -c, so the p10k wizard can't start in either variant.
+	#
+	#   clean_zsh  no terminal, like the `zsh -lic` GUI apps and IDEs run to
+	#              read your environment; powerlevel10k is skipped there
+	#   tty_zsh    inside a pseudo-terminal via script(1), like a real tab, so
+	#              powerlevel10k loads. stdout and stderr arrive merged, and the
+	#              terminal echoes script's end of input as "^D" plus two
+	#              backspaces; that echo and the CRs are stripped
+	zsh_env=(env -i HOME="$HOME" USER="${USER:-$(id -un)}" LOGNAME="${LOGNAME:-$(id -un)}"
+		SHELL=/bin/zsh TERM=xterm-256color)
+	clean_zsh() { "${zsh_env[@]}" zsh -lic "$1"; }
+	tty_zsh()   { script -q /dev/null "${zsh_env[@]}" zsh -lic "$1" </dev/null | sed $'s/\\^D\b\b//g' | tr -d '\r'; }
 
 	errors="$(clean_zsh exit 2>&1 >/dev/null)" \
-		|| fail "a new zsh exited non-zero:
+		|| fail "a new zsh without a terminal exited non-zero:
 $errors"
-	[ -z "$errors" ] || fail "a new zsh printed errors on startup:
+	[ -z "$errors" ] || fail "a new zsh without a terminal printed errors on startup:
 $errors"
-	ok "a new shell starts with no errors"
+	errors="$(tty_zsh exit)"
+	[ -z "$errors" ] || fail "a new zsh in a terminal printed this on startup:
+$errors"
+	ok "a new shell starts silently, with and without a terminal"
 
 	# shellcheck disable=SC2016  # expanded by zsh, not here
-	read -r autosuggest highlight prompt <<<"$(clean_zsh \
-		'print ${+functions[_zsh_autosuggest_start]} ${+functions[_zsh_highlight]} ${+functions[prompt_starship_precmd]}' 2>/dev/null)"
+	read -r autosuggest highlight prompt <<<"$(tty_zsh \
+		'print ${+functions[_zsh_autosuggest_start]} ${+functions[_zsh_highlight]} ${+functions[p10k]}')"
 	[ "$autosuggest" = 1 ] || fail "zsh-autosuggestions did not load"
 	[ "$highlight" = 1 ]   || fail "zsh-syntax-highlighting did not load"
-	[ "$prompt" = 1 ]      || fail "starship prompt did not load"
-	ok "plugins and starship load"
+	[ "$prompt" = 1 ]      || fail "powerlevel10k did not load"
+	ok "plugins and powerlevel10k load"
 
 	# shellcheck disable=SC2016
 	read -r comp_git comp_npm <<<"$(clean_zsh 'print ${_comps[git]:--} ${_comps[npm]:--}' 2>/dev/null)"
@@ -205,3 +181,6 @@ fi
 
 summary
 ok "zsh dotfiles installed — open a new terminal tab to use them"
+if [ ! -f "$DOTFILES_ROOT/zsh/p10k.zsh" ]; then
+	info "powerlevel10k isn't configured yet: its wizard starts by itself in that new tab (or run: p10k configure)"
+fi

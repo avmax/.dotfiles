@@ -2,7 +2,7 @@
 # `zsh -l -c …` that GUI apps and IDE tasks run to pick up your environment.
 # Those non-interactive shells never read ~/.zshrc, which is why PATH lives
 # here. Without this file, /usr/bin/git (Apple's) beats Homebrew's, and
-# `starship` and `code` aren't found.
+# `code` isn't found.
 # Linked from <repo>/zsh/zprofile by install/zsh.sh.
 
 typeset -U path   # keep PATH entries unique
@@ -15,8 +15,7 @@ elif [[ -x /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-# Personal binaries (starship lands in ~/.local/bin when Homebrew isn't usable).
-# (N-/) drops the entry if the directory doesn't exist.
+# Personal binaries. (N-/) drops the entry if the directory doesn't exist.
 path=("$HOME/.local/bin"(N-/) "$HOME/bin"(N-/) $path)
 
 # Editor CLIs that live inside their app bundles: `code` (VS Code).

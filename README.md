@@ -12,7 +12,7 @@ Every installer is **idempotent** (run it as often as you like) and
 | topic  | config in repo | installer | notes |
 | ------ | -------------- | --------- | ----- |
 | git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
-| zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, Starship prompt |
+| zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
 | tmux   | ✅ `tmux/`     | ❌ | still in legacy `install/setup.sh` |
 | vim    | ✅ `vim/`      | ❌ | still in legacy `install/setup.sh` |
 | sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
@@ -131,18 +131,18 @@ Creates:
 | ---- | ---- | ------ |
 | `~/.zprofile` | symlink | `zsh/zprofile` — login shells: `PATH`, Homebrew first |
 | `~/.zshrc` | symlink | `zsh/zshrc` — interactive shells |
-| `~/.config/starship.toml` | symlink | `zsh/starship.toml` — prompt layout |
 | `~/.zshrc.local` | copy, once, mode 600 | `zsh/zshrc.local.example` |
-| `~/.local/share/zsh/plugins/` | git clones | zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions |
-| `~/.local/bin/starship` | release binary | only when Homebrew can't install it (see below) |
+| `~/.local/share/zsh/plugins/` | git clones | powerlevel10k, zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions |
+| `~/.cache/gitstatus/` | download | gitstatusd, which powerlevel10k uses for git status |
 
-Re-running it updates the plugins. It then starts a fresh login shell and
-fails if that shell prints anything to stderr, if a plugin or the prompt
-didn't load, or if git / npm have no completion.
+Re-running it updates the plugins. It then starts fresh login shells, with
+and without a terminal, and fails if either prints anything on startup, if a
+plugin or the prompt didn't load, or if git / npm have no completion.
 
 No framework: oh-my-zsh is gone. The installer retires it without deleting
 anything —
-`~/.oh-my-zsh` and old `~/.zcompdump*` files move to the backup dir, and
+`~/.oh-my-zsh`, an earlier Starship setup and old `~/.zcompdump*` files move
+to the backup dir, and
 `~/.zhistory`, where the old config wrote history, is appended to
 `~/.zsh_history` first.
 
@@ -150,45 +150,59 @@ anything —
 
 | file | contents |
 | ---- | -------- |
-| `zshrc` | loads the modules below in order, then `~/.zshrc.local` |
+| `zshrc` | loads the modules below, powerlevel10k with its instant prompt, then `~/.zshrc.local` |
 | `options.zsh` | `EDITOR`, `LESS`, ls colors, history, directory options |
 | `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu and colors |
 | `aliases.zsh` | `ll`/`la`, safe `rm`; `chrome`/`firefox`/`safari` (take a URL, bare domain or file), `telegram` |
 | `functions.zsh` | `up`, `mkcddir`, `gitroot`, `f`, `replace`, `extract`, `port`/`killport`, `nr` (Tab completes script names), `myip`, `cls` |
 | `keybindings.zsh` | every binding commented with its key and action; ↑/↓ search history by what's typed |
-| `plugins.zsh` | starship, autosuggestions, then syntax highlighting — which must load last |
-| `starship.toml` | the prompt layout |
+| `plugins.zsh` | autosuggestions, then syntax highlighting — which must load last |
+| `p10k.zsh` | powerlevel10k settings, written by `p10k configure` |
 
 Secrets and per-machine settings go in `~/.zshrc.local`, never in the repo.
 Start a command with a space to keep it out of history.
 
 ### Prompt
 
-[Starship](https://starship.rs): OS, RAM, local IP and node version on the
-first line with git on the right, the directory and `❯` on the second. It
-uses only symbols macOS fonts already have, so any terminal font works. Edit
-`zsh/starship.toml`; `starship explain` shows what each segment is.
+[Powerlevel10k](https://github.com/romkatv/powerlevel10k), set up through
+its configuration wizard. While `zsh/p10k.zsh` doesn't exist, the wizard
+starts by itself in every new terminal tab; `p10k configure` runs it again
+later. It writes its answers straight into `zsh/p10k.zsh` in this repo —
+commit that file. It won't offer to edit `~/.zshrc`: `zsh/zshrc` already has
+the instant-prompt block and the `source` line it looks for.
+
+- **Font.** The icons need a Nerd Font. Run the wizard in iTerm2 and it
+  offers to download *MesloLGS NF* and switch the iTerm2 profile to it.
+  Other terminals then only need the font selected — for VS Code and
+  Cursor: `"terminal.integrated.fontFamily": "MesloLGS NF"`.
+- **Instant prompt.** The prompt appears before the rest of the config has
+  loaded, so nothing in the config may print during startup. The wizard's
+  *verbose* mode warns if something does.
+- **Real terminals only.** It's skipped in dumb terminals and in shells with
+  no terminal at all, like the `zsh -lic` IDEs run to read your environment:
+  its git helper can't start there and would print errors.
+- **Support.** Upstream says the project has very limited support: no new
+  features, and most bugs will go unfixed.
 
 ### Homebrew owned by another account
 
 If `/opt/homebrew` belongs to a different macOS user, `brew install` fails
 for you and zsh reports Homebrew's completion directory as insecure. The
-config copes — it uses those completions anyway, and the installer falls
-back to Starship's release binary — but the real fix is ownership:
+config copes by using those completions anyway, but the real fix is
+ownership:
 
 ```bash
 sudo chown -R "$(whoami)" /opt/homebrew
 ```
 
 That takes Homebrew away from the other account, so only do it if nobody
-uses brew there. Afterwards you can `brew install starship` and
-`rm ~/.local/bin/starship`.
+uses brew there.
 
 ### Rolling it back
 
 ```bash
 ls ~/.dotfiles-backup/                       # pick a timestamp
-rm ~/.zprofile ~/.zshrc ~/.config/starship.toml   # remove the symlinks
+rm ~/.zprofile ~/.zshrc                      # remove the symlinks
 mv ~/.dotfiles-backup/<timestamp>/.oh-my-zsh ~/.oh-my-zsh
 git checkout master -- zsh/                  # the 2019 config, then relink:
 ln -s ~/.dotfiles/zsh/index.zsh ~/.zshrc
@@ -232,7 +246,8 @@ Then Rectangle → Settings → *Import* → point it at
 ### iTerm2
 
 1. Settings → Profiles → Colors → *Color Presets* → **Solarized Light**
-2. Settings → Profiles → Text → font size **14**, horizontal/vertical spacing 100
+2. Font: run `p10k configure` in iTerm2 — it installs **MesloLGS NF** and
+   switches the profile to it (see [Prompt](#prompt))
 3. Settings → Profiles → Text → Cursor: **Vertical Bar**
 
 ### VS Code
@@ -299,7 +314,8 @@ reference.
 ├── zsh/
 │   ├── zprofile              -> ~/.zprofile
 │   ├── zshrc                 -> ~/.zshrc (loads the *.zsh modules)
-│   ├── *.zsh, starship.toml
+│   ├── *.zsh                 modules loaded by zshrc
+│   ├── p10k.zsh              powerlevel10k settings, written by p10k configure
 │   └── zshrc.local.example
 ├── tmux/ vim/                config, not yet migrated
 ├── spectacle/                legacy window-manager shortcuts
