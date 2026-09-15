@@ -4,7 +4,9 @@
 #
 #   ~/.zprofile     -> symlink to <repo>/zsh/zprofile   login shells: PATH, Homebrew
 #   ~/.zshrc        -> symlink to <repo>/zsh/zshrc      interactive shells
-#   ~/.zshrc.local  -> copy of <repo>/zsh/zshrc.local.example (once, mode 600)
+#
+# ~/.zshrc.local, for machine-specific settings and secrets, is yours to create
+# (see zsh/readme.md); if it exists, the installer keeps it private (mode 600).
 #
 # plus the plugins the config loads, cloned into ~/.local/share/zsh/plugins and
 # updated on every run:
@@ -67,7 +69,6 @@ fi
 info "linking zsh config"
 link_file "$DOTFILES_ROOT/zsh/zprofile" "$HOME/.zprofile"
 link_file "$DOTFILES_ROOT/zsh/zshrc"    "$HOME/.zshrc"
-copy_once "$DOTFILES_ROOT/zsh/zshrc.local.example" "$HOME/.zshrc.local"
 if [ -f "$HOME/.zshrc.local" ]; then
 	run chmod 600 "$HOME/.zshrc.local"   # it's where secrets go
 fi

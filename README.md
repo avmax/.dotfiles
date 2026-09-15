@@ -125,94 +125,14 @@ cp ~/.dotfiles-backup/<timestamp>/.gitconfig ~/.gitconfig
 ./index.sh zsh
 ```
 
-Creates:
+A plain zsh setup with no framework: a powerlevel10k prompt, fish-style
+suggestions, syntax highlighting, and one color scheme tuned for iTerm2's
+Solarized Light preset.
 
-| path | kind | source |
-| ---- | ---- | ------ |
-| `~/.zprofile` | symlink | `zsh/zprofile` — login shells: `PATH`, Homebrew first |
-| `~/.zshrc` | symlink | `zsh/zshrc` — interactive shells |
-| `~/.zshrc.local` | copy, once, mode 600 | `zsh/zshrc.local.example` |
-| `~/.local/share/zsh/plugins/` | git clones | powerlevel10k, zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions |
-| `~/.cache/gitstatus/` | download | gitstatusd, which powerlevel10k uses for git status |
-
-Re-running it updates the plugins. It then starts fresh login shells, with
-and without a terminal, and fails if either prints anything on startup, if a
-plugin or the prompt didn't load, or if git / npm have no completion.
-
-No framework: oh-my-zsh is gone. The installer retires it without deleting
-anything —
-`~/.oh-my-zsh`, an earlier Starship setup and old `~/.zcompdump*` files move
-to the backup dir, and
-`~/.zhistory`, where the old config wrote history, is appended to
-`~/.zsh_history` first.
-
-### What's in `zsh/`
-
-| file | contents |
-| ---- | -------- |
-| `zshrc` | loads the modules below, powerlevel10k with its instant prompt, then `~/.zshrc.local` |
-| `options.zsh` | `EDITOR`, `LESS`, history, directory options |
-| `colors.zsh` | every color, as one Solarized Light scheme: ls, completion lists, the command line as you type, and the prompt |
-| `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu |
-| `aliases.zsh` | `ll`/`la`, safe `rm`; `chrome`/`firefox`/`safari` (take a URL, bare domain or file), `telegram` |
-| `functions.zsh` | `up`, `mkcddir`, `gitroot`, `f`, `replace`, `extract`, `port`/`killport`, `nr` (Tab completes script names), `myip`, `cls` |
-| `keybindings.zsh` | every binding commented with its key and action; ↑/↓ search history by what's typed |
-| `plugins.zsh` | autosuggestions, then syntax highlighting — which must load last — plus two small highlighters: fade a mistyped command, darken quote marks |
-| `p10k.zsh` | powerlevel10k settings, written by `p10k configure` (its colors are overridden by `colors.zsh`) |
-
-Secrets and per-machine settings go in `~/.zshrc.local`, never in the repo.
-Start a command with a space to keep it out of history.
-
-### Prompt
-
-[Powerlevel10k](https://github.com/romkatv/powerlevel10k), set up through
-its configuration wizard. While `zsh/p10k.zsh` doesn't exist, the wizard
-starts by itself in every new terminal tab; `p10k configure` runs it again
-later. It writes its answers straight into `zsh/p10k.zsh` in this repo —
-commit that file. It won't offer to edit `~/.zshrc`: `zsh/zshrc` already has
-the instant-prompt block and the `source` line it looks for.
-
-The prompt's colors don't come from `zsh/p10k.zsh`: `apply_prompt_colors` in
-`zsh/colors.zsh` sets them right after it loads, so they survive re-running
-the wizard. After editing either file, open a new tab or run `exec zsh` —
-`p10k reload` only redraws from the settings already loaded.
-
-- **Font.** The icons need a Nerd Font. Run the wizard in iTerm2 and it
-  offers to download *MesloLGS NF* and switch the iTerm2 profile to it.
-  Other terminals then only need the font selected — for VS Code and
-  Cursor: `"terminal.integrated.fontFamily": "MesloLGS NF"`.
-- **Instant prompt.** The prompt appears before the rest of the config has
-  loaded, so nothing in the config may print during startup. The wizard's
-  *verbose* mode warns if something does.
-- **Real terminals only.** It's skipped in dumb terminals and in shells with
-  no terminal at all, like the `zsh -lic` IDEs run to read your environment:
-  its git helper can't start there and would print errors.
-- **Support.** Upstream says the project has very limited support: no new
-  features, and most bugs will go unfixed.
-
-### Homebrew owned by another account
-
-If `/opt/homebrew` belongs to a different macOS user, `brew install` fails
-for you and zsh reports Homebrew's completion directory as insecure. The
-config copes by using those completions anyway, but the real fix is
-ownership:
-
-```bash
-sudo chown -R "$(whoami)" /opt/homebrew
-```
-
-That takes Homebrew away from the other account, so only do it if nobody
-uses brew there.
-
-### Rolling it back
-
-```bash
-ls ~/.dotfiles-backup/                       # pick a timestamp
-rm ~/.zprofile ~/.zshrc                      # remove the symlinks
-mv ~/.dotfiles-backup/<timestamp>/.oh-my-zsh ~/.oh-my-zsh
-git checkout master -- zsh/                  # the 2019 config, then relink:
-ln -s ~/.dotfiles/zsh/index.zsh ~/.zshrc
-```
+- [zsh/install.md](zsh/install.md) — requirements, what the installer does,
+  terminal and font setup, updating, troubleshooting, rolling back
+- [zsh/readme.md](zsh/readme.md) — how the config is organized, aliases,
+  functions, keys, colors, the prompt, and local settings
 
 ## Manual setup
 
@@ -252,8 +172,8 @@ Then Rectangle → Settings → *Import* → point it at
 ### iTerm2
 
 1. Settings → Profiles → Colors → *Color Presets* → **Solarized Light**
-2. Font: run `p10k configure` in iTerm2 — it installs **MesloLGS NF** and
-   switches the profile to it (see [Prompt](#prompt))
+2. Font: **MesloLGS NF**, for the prompt's icons — see
+   [zsh/install.md](zsh/install.md#4-set-up-the-terminal)
 3. Settings → Profiles → Text → Cursor: **Vertical Bar**
 
 ### VS Code
@@ -318,11 +238,12 @@ reference.
 │   ├── gitignore_global      -> ~/.gitignore_global
 │   └── gitconfig.local.example
 ├── zsh/
+│   ├── readme.md             how the zsh setup works
+│   ├── install.md            how to install it
 │   ├── zprofile              -> ~/.zprofile
 │   ├── zshrc                 -> ~/.zshrc (loads the *.zsh modules)
 │   ├── *.zsh                 modules loaded by zshrc
-│   ├── p10k.zsh              powerlevel10k settings, written by p10k configure
-│   └── zshrc.local.example
+│   └── p10k.zsh              powerlevel10k settings, written by p10k configure
 ├── tmux/ vim/                config, not yet migrated
 ├── spectacle/                legacy window-manager shortcuts
 └── sublime/                  unmaintained

@@ -41,5 +41,5 @@ unset _zshrc_p10k
 
 source "$ZSH_CONFIG_DIR/plugins.zsh"
 
-# Machine-specific settings and secrets. Never tracked — see zshrc.local.example.
+# Machine-specific settings and secrets. Never tracked — see readme.md.
 [[ -r ~/.zshrc.local ]] && source ~/.zshrc.local
