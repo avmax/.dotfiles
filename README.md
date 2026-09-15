@@ -13,7 +13,7 @@ Every installer is **idempotent** (run it as often as you like) and
 | ------ | -------------- | --------- | ----- |
 | git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
 | zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, powerlevel10k prompt |
-| downloads | — | ✅ `install/downloads.sh` | desktop apps — see [Applications](#applications) |
+| downloads | — | ✅ `install/downloads.sh` | developer tools and desktop apps — see [Tools and apps](#tools-and-apps) |
 | tmux   | ✅ `tmux/`     | ❌ | no installer yet |
 | vim    | ✅ `vim/`      | ❌ | no installer yet |
 | sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
@@ -186,14 +186,25 @@ account menu in the bottom-left. The old
 [settings gist](https://gist.github.com/avmax/4296510c21aeee0ab94684d3d3bc61c2)
 is kept only as a reference.
 
-## Applications
+## Tools and apps
 
 ```bash
 ./index.sh downloads
 ```
 
-Installs these, skipping any that are already in `/Applications` or
-`~/Applications` — however they got there:
+Installs whatever is missing from two lists, and skips anything that's already
+installed — however it got there.
+
+**Developer tools**
+
+| tool | from |
+| ---- | ---- |
+| Homebrew | the installer from [brew.sh](https://brew.sh) |
+| node, npm, npx | Homebrew `node` |
+| python3, pip3 | Homebrew `python` |
+| PostgreSQL 18 | Homebrew `postgresql@18`, with `psql` and the rest linked onto `PATH` |
+
+**Desktop apps**
 
 | app | from |
 | --- | ---- |
@@ -205,14 +216,31 @@ Installs these, skipping any that are already in `/Applications` or
 | AmneziaVPN | Homebrew Cask `amneziavpn` |
 | WireGuard | Mac App Store, with [mas](https://github.com/mas-cli/mas) — the only place WireGuard for macOS is released |
 
-**Requires [Homebrew](https://brew.sh)**, and for WireGuard an Apple Account
-signed in to the App Store. mas is installed with Homebrew the first time
-WireGuard is missing; if mas can't install it, the script opens WireGuard's
-App Store page instead. The AmneziaVPN installer and mas ask for your password.
+A tool counts as installed when its commands are on `PATH` (macOS's own
+`/usr/bin/python3` and `pip3` don't count), and PostgreSQL also when Homebrew
+already has some `postgresql@N` or Postgres.app is there. An app counts when
+it's in `/Applications` or `~/Applications`.
 
-Each install is checked: if an app didn't land, the run ends with an error
-naming it. When a cask has been renamed, `brew search <app>` finds the new
-name.
+Good to know:
+
+- **PostgreSQL isn't started.** `brew services start postgresql@18` runs it now
+  and at every login.
+- **Python is `python3` and `pip3`.** Homebrew keeps the unversioned `python`
+  and `pip` in `$(brew --prefix python)/libexec/bin`, which isn't on `PATH`.
+- **Homebrew owned by another macOS user** makes `brew install` fail. The
+  script warns about it up front; the fix is in
+  [zsh/install.md](zsh/install.md#homebrew-owned-by-another-account).
+- **Right after installing Homebrew**, skip its "Next steps": `zsh/zprofile`
+  already puts `brew` on `PATH` (`./index.sh zsh`).
+- **WireGuard** needs an Apple Account signed in to the App Store. mas is
+  installed with Homebrew the first time WireGuard is missing; if mas can't
+  install it, the script opens WireGuard's App Store page instead.
+- The Homebrew installer, the AmneziaVPN installer and mas ask for your
+  password.
+
+Each install is checked: if something didn't land, the run ends with an error
+naming it. When a formula or cask has been renamed, `brew search <name>` finds
+the new name.
 
 Everything else is installed by hand — most have a cask too
 (`brew search <app>`):
@@ -242,7 +270,7 @@ in the branch discussion; it is not set up yet.
 │   ├── custom-functions.sh   shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
 │   ├── zsh.sh                zsh topic installer
-│   └── downloads.sh          desktop apps (Homebrew Cask, Mac App Store)
+│   └── downloads.sh          developer tools and desktop apps
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
 │   ├── gitignore_global      -> ~/.gitignore_global
