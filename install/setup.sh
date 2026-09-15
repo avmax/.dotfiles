@@ -14,20 +14,7 @@ set -x #echo on
 rm -rf ~/.tmux.conf
 ln -s ~/.dotfiles/tmux/index.conf ~/.tmux.conf
 
-# setup zsh
-rm -rf ~/.oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-rm -rf ~/.zshrc
-ln -s ~/.dotfiles/zsh/index.zsh ~/.zshrc
-
-git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
-
-zsh
-chsh -s $(which zsh)
-source ~/.zshrc
+# setup zsh -> migrated to install/zsh.sh (run: ./index.sh zsh)
 
 # setup vim
 rm -rf ~/.vim

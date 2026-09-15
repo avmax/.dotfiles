@@ -1,0 +1,17 @@
+# ~/.zshrc — interactive shells. Linked from <repo>/zsh/zshrc by install/zsh.sh.
+#
+# Load order matters: options before completion (LS_COLORS), completion before
+# keybindings (menuselect keymap), and plugins last — zsh-syntax-highlighting
+# has to wrap every widget defined before it.
+
+# This file's real directory, resolved through the ~/.zshrc symlink, so the
+# repo works from any path.
+ZSH_CONFIG_DIR="${${(%):-%x}:A:h}"
+
+for _module in options completion aliases functions keybindings plugins; do
+  source "$ZSH_CONFIG_DIR/$_module.zsh"
+done
+unset _module
+
+# Machine-specific settings and secrets. Never tracked — see zshrc.local.example.
+[[ -r ~/.zshrc.local ]] && source ~/.zshrc.local

@@ -16,10 +16,10 @@ cd "$(dirname "$0")"
 ROOT="$(pwd -P)"
 
 # Topics that have been migrated to the new installer contract.
-READY=(git)
+READY=(git zsh)
 
 # Config lives in the repo but has no installer yet — see README.
-PENDING=(zsh tmux vim)
+PENDING=(tmux vim)
 
 usage() {
 	cat <<EOF

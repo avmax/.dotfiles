@@ -12,7 +12,7 @@ Every installer is **idempotent** (run it as often as you like) and
 | topic  | config in repo | installer | notes |
 | ------ | -------------- | --------- | ----- |
 | git    | ✅ `git/`      | ✅ `install/git.sh` | modernized, requires git ≥ 2.38 |
-| zsh    | ✅ `zsh/`      | ❌ | still in legacy `install/setup.sh` |
+| zsh    | ✅ `zsh/`      | ✅ `install/zsh.sh` | modernized: no oh-my-zsh, Starship prompt |
 | tmux   | ✅ `tmux/`     | ❌ | still in legacy `install/setup.sh` |
 | vim    | ✅ `vim/`      | ❌ | still in legacy `install/setup.sh` |
 | sublime | ✅ `sublime/` | ❌ | unmaintained — kept for archaeology |
@@ -119,6 +119,81 @@ rm ~/.gitconfig ~/.gitignore_global          # remove the symlinks
 cp ~/.dotfiles-backup/<timestamp>/.gitconfig ~/.gitconfig
 ```
 
+## zsh
+
+```bash
+./index.sh zsh
+```
+
+Creates:
+
+| path | kind | source |
+| ---- | ---- | ------ |
+| `~/.zprofile` | symlink | `zsh/zprofile` — login shells: `PATH`, Homebrew first |
+| `~/.zshrc` | symlink | `zsh/zshrc` — interactive shells |
+| `~/.config/starship.toml` | symlink | `zsh/starship.toml` — prompt layout |
+| `~/.zshrc.local` | copy, once, mode 600 | `zsh/zshrc.local.example` |
+| `~/.local/share/zsh/plugins/` | git clones | zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions |
+| `~/.local/bin/starship` | release binary | only when Homebrew can't install it (see below) |
+
+Re-running it updates the plugins. It then starts a fresh login shell and
+fails if that shell prints anything to stderr, if a plugin or the prompt
+didn't load, or if git / npm have no completion.
+
+No framework: oh-my-zsh is gone. The installer retires it without deleting
+anything —
+`~/.oh-my-zsh` and old `~/.zcompdump*` files move to the backup dir, and
+`~/.zhistory`, where the old config wrote history, is appended to
+`~/.zsh_history` first.
+
+### What's in `zsh/`
+
+| file | contents |
+| ---- | -------- |
+| `zshrc` | loads the modules below in order, then `~/.zshrc.local` |
+| `options.zsh` | `EDITOR`, `LESS`, ls colors, history, directory options |
+| `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu and colors |
+| `aliases.zsh` | `ll`/`la`, safe `rm`; `chrome`/`firefox`/`safari` (take a URL, bare domain or file), `telegram` |
+| `functions.zsh` | `up`, `f`, `replace`, `extract`, `cls` |
+| `keybindings.zsh` | every binding commented with its key and action; ↑/↓ search history by what's typed |
+| `plugins.zsh` | starship, autosuggestions, then syntax highlighting — which must load last |
+| `starship.toml` | the prompt layout |
+
+Secrets and per-machine settings go in `~/.zshrc.local`, never in the repo.
+Start a command with a space to keep it out of history.
+
+### Prompt
+
+[Starship](https://starship.rs): OS, RAM, local IP and node version on the
+first line with git on the right, the directory and `❯` on the second. It
+uses only symbols macOS fonts already have, so any terminal font works. Edit
+`zsh/starship.toml`; `starship explain` shows what each segment is.
+
+### Homebrew owned by another account
+
+If `/opt/homebrew` belongs to a different macOS user, `brew install` fails
+for you and zsh reports Homebrew's completion directory as insecure. The
+config copes — it uses those completions anyway, and the installer falls
+back to Starship's release binary — but the real fix is ownership:
+
+```bash
+sudo chown -R "$(whoami)" /opt/homebrew
+```
+
+That takes Homebrew away from the other account, so only do it if nobody
+uses brew there. Afterwards you can `brew install starship` and
+`rm ~/.local/bin/starship`.
+
+### Rolling it back
+
+```bash
+ls ~/.dotfiles-backup/                       # pick a timestamp
+rm ~/.zprofile ~/.zshrc ~/.config/starship.toml   # remove the symlinks
+mv ~/.dotfiles-backup/<timestamp>/.oh-my-zsh ~/.oh-my-zsh
+git checkout master -- zsh/                  # the 2019 config, then relink:
+ln -s ~/.dotfiles/zsh/index.zsh ~/.zshrc
+```
+
 ## Manual setup
 
 Things macOS does not let a script do reliably, or that are one-off.
@@ -156,13 +231,9 @@ Then Rectangle → Settings → *Import* → point it at
 
 ### iTerm2
 
-1. Install `InconsolataGo Nerd Font` from `fonts/InconsolataGo/` (double-click
-   the `.ttf` files). The Nerd Fonts project also publishes Homebrew casks
-   that stay current — `brew search inconsolata` to find the name.
-2. Settings → Profiles → Colors → *Color Presets* → **Solarized Light**
-3. Settings → Profiles → Text → font **InconsolataGo Nerd Font, Regular, 14**,
-   horizontal/vertical spacing 100
-4. Settings → Profiles → Text → Cursor: **Vertical Bar**
+1. Settings → Profiles → Colors → *Color Presets* → **Solarized Light**
+2. Settings → Profiles → Text → font size **14**, horizontal/vertical spacing 100
+3. Settings → Profiles → Text → Cursor: **Vertical Bar**
 
 ### VS Code
 
@@ -217,15 +288,20 @@ reference.
 ├── install/
 │   ├── lib.sh                shared helpers (link_file, backups, DRY_RUN)
 │   ├── git.sh                git topic installer
-│   ├── setup.sh              LEGACY — zsh/tmux/vim, destructive
+│   ├── zsh.sh                zsh topic installer
+│   ├── setup.sh              LEGACY — tmux/vim, destructive
 │   ├── download.sh           LEGACY — brew installs
 │   └── apps.sh               LEGACY — commented-out .dmg downloads
 ├── git/
 │   ├── gitconfig             -> ~/.gitconfig
 │   ├── gitignore_global      -> ~/.gitignore_global
 │   └── gitconfig.local.example
-├── zsh/ tmux/ vim/           config, not yet migrated
-├── fonts/                    InconsolataGo Nerd Font
+├── zsh/
+│   ├── zprofile              -> ~/.zprofile
+│   ├── zshrc                 -> ~/.zshrc (loads the *.zsh modules)
+│   ├── *.zsh, starship.toml
+│   └── zshrc.local.example
+├── tmux/ vim/                config, not yet migrated
 ├── spectacle/                legacy window-manager shortcuts
 └── sublime/                  unmaintained
 ```
