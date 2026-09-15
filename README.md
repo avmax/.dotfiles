@@ -154,7 +154,7 @@ anything —
 | `options.zsh` | `EDITOR`, `LESS`, ls colors, history, directory options |
 | `completion.zsh` | `compinit` with a cache in `~/.cache/zsh`, menu and colors |
 | `aliases.zsh` | `ll`/`la`, safe `rm`; `chrome`/`firefox`/`safari` (take a URL, bare domain or file), `telegram` |
-| `functions.zsh` | `up`, `f`, `replace`, `extract`, `cls` |
+| `functions.zsh` | `up`, `mkcddir`, `gitroot`, `f`, `replace`, `extract`, `port`/`killport`, `nr` (Tab completes script names), `myip`, `cls` |
 | `keybindings.zsh` | every binding commented with its key and action; ↑/↓ search history by what's typed |
 | `plugins.zsh` | starship, autosuggestions, then syntax highlighting — which must load last |
 | `starship.toml` | the prompt layout |
