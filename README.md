@@ -226,6 +226,7 @@ installed — however it got there.
 | node, npm, npx | Homebrew `node` |
 | python3, pip3 | Homebrew `python` |
 | PostgreSQL 18 | Homebrew `postgresql@18`, with `psql` and the rest linked onto `PATH` |
+| Docker | Homebrew Cask `docker-desktop` — Docker Desktop, with `docker` and `docker compose` |
 
 **Desktop apps**
 
@@ -240,14 +241,18 @@ installed — however it got there.
 | WireGuard | Mac App Store, with [mas](https://github.com/mas-cli/mas) — the only place WireGuard for macOS is released |
 
 A tool counts as installed when its commands are on `PATH` (macOS's own
-`/usr/bin/python3` and `pip3` don't count), and PostgreSQL also when Homebrew
-already has some `postgresql@N` or Postgres.app is there. An app counts when
-it's in `/Applications` or `~/Applications`.
+`/usr/bin/python3` and `pip3` don't count). PostgreSQL also counts when
+Homebrew already has some `postgresql@N` or Postgres.app is there, and Docker
+when `Docker.app` is — so OrbStack or Colima, which bring their own `docker`,
+are left alone. An app counts when it's in `/Applications` or
+`~/Applications`.
 
 Good to know:
 
 - **PostgreSQL isn't started.** `brew services start postgresql@18` runs it now
   and at every login.
+- **Docker isn't started either.** Open Docker once: it asks you to accept its
+  terms, then starts the engine that `docker` commands need.
 - **Python is `python3` and `pip3`.** Homebrew keeps the unversioned `python`
   and `pip` in `$(brew --prefix python)/libexec/bin`, which isn't on `PATH`.
 - **Homebrew owned by another macOS user** makes `brew install` fail. The
@@ -258,8 +263,9 @@ Good to know:
 - **WireGuard** needs an Apple Account signed in to the App Store. mas is
   installed with Homebrew the first time WireGuard is missing; if mas can't
   install it, the script opens WireGuard's App Store page instead.
-- The Homebrew installer, the AmneziaVPN installer and mas ask for your
-  password.
+- The Homebrew installer, the AmneziaVPN installer, mas and Docker Desktop's
+  install ask for your password (Docker Desktop links `docker` into
+  `/usr/local/bin`, which Homebrew doesn't own on Apple Silicon).
 
 Each install is checked: if something didn't land, the run ends with an error
 naming it. When a formula or cask has been renamed, `brew search <name>` finds
@@ -277,7 +283,6 @@ Everything else is installed by hand — most have a cask too
 | Figma | <https://www.figma.com/downloads/> |
 | Slack | <https://slack.com/downloads/mac> |
 | Notion | <https://www.notion.so/desktop> |
-| Docker Desktop | <https://www.docker.com/products/docker-desktop> |
 | Postman | <https://www.postman.com/downloads/> |
 | Rectangle | <https://rectangleapp.com/> |
 
