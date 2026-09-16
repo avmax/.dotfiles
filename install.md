@@ -17,10 +17,10 @@ Setting up a new Mac. More on any of this in [README.md](README.md).
    ```
 
    It installs everything — git, apps and tools, zsh, iTerm2's settings — and
-   asks for your password a few times (the Homebrew and AmneziaVPN installers,
-   the App Store helper). `DRY_RUN=1 ./install.sh` shows what it would do
-   without doing it. Running it again is safe: anything replaced is kept in
-   `~/.dotfiles-backup/<timestamp>/`.
+   asks for your password a few times (the Homebrew, AmneziaVPN and Docker
+   Desktop installs, the App Store helper). `DRY_RUN=1 ./install.sh` shows what
+   it would do without doing it. Running it again is safe: anything replaced
+   is kept in `~/.dotfiles-backup/<timestamp>/`.
 
 4. Install the **MesloLGS NF** font by hand, for the prompt's icons — four
    files, see [zsh/install.md](zsh/install.md#4-set-up-the-terminal).
@@ -28,8 +28,9 @@ Setting up a new Mac. More on any of this in [README.md](README.md).
 5. Open a new iTerm2 tab. Prompt, colors and key bindings are in place; the
    powerlevel10k wizard opening on the first tab is expected.
 
-6. Left by hand: `~/.gitconfig.local` for a work email or signing key, the
-   macOS tweaks under *Manual setup* in README, and tmux and vim, which have no
+6. Left by hand: opening Docker once, to accept its terms and start its
+   engine; `~/.gitconfig.local` for a work email or signing key; the macOS
+   tweaks under *Manual setup* in README; and tmux and vim, which have no
    installer yet.
 
 Keep the repo where it is — `~/.gitconfig`, `~/.zshrc` and `~/.zprofile` become

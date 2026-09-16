@@ -9,6 +9,8 @@
 #   node, npm, npx       Homebrew  node
 #   python3, pip3        Homebrew  python
 #   PostgreSQL 18        Homebrew  postgresql@18, psql & co. linked onto PATH
+#   Docker               Homebrew Cask  docker-desktop (Docker Desktop, with
+#                        docker and docker compose)
 #
 # Desktop apps
 #
@@ -23,16 +25,18 @@
 #                        WireGuard is missing and mas isn't installed yet
 #
 # A tool counts as installed when its commands are on PATH (macOS's own
-# /usr/bin/python3 and pip3 don't count), and PostgreSQL also when Homebrew
-# already has some postgresql@N or Postgres.app is there. An app counts when
-# it's in /Applications or ~/Applications.
+# /usr/bin/python3 and pip3 don't count). PostgreSQL also counts when Homebrew
+# already has some postgresql@N or Postgres.app is there, and Docker when
+# Docker.app is. An app counts when it's in /Applications or ~/Applications.
 #
-# PostgreSQL isn't started: `brew services start postgresql@18` runs it now and
-# at every login. If mas can't install WireGuard, its App Store page opens
-# instead.
+# Neither PostgreSQL nor Docker is started. `brew services start postgresql@18`
+# runs PostgreSQL now and at every login; open Docker once to accept its terms
+# and start its engine. If mas can't install WireGuard, its App Store page
+# opens instead.
 #
-# The Homebrew installer, the AmneziaVPN installer and mas ask for your
-# password. WireGuard needs an Apple Account signed in to the App Store.
+# The Homebrew installer, the AmneziaVPN and Docker Desktop installs, and mas
+# ask for your password. WireGuard needs an Apple Account signed in to the App
+# Store.
 #
 # Safe to run repeatedly. Preview without touching anything:
 #   DRY_RUN=1 ./_install-scripts/apps-and-tools.sh
@@ -196,6 +200,20 @@ else
 			warn "brew installed $POSTGRES, but psql isn't on PATH"
 			missing PostgreSQL
 		fi
+	fi
+fi
+
+# Docker Desktop, unless Docker.app is already there or docker comes from
+# something else, such as OrbStack or Colima — the cask's own docker would
+# clash with it.
+if docker_app="$(app_path "Docker.app")"; then
+	ok "already installed: $(pretty "$docker_app")"
+elif on_path docker; then
+	ok "already installed: docker ($(pretty "$(command -v docker)"))"
+else
+	install_app "Docker.app" brew install --cask docker-desktop
+	if [ "$DRY_RUN" != "1" ] && app_path "Docker.app" >/dev/null; then
+		info "not started — open Docker once to accept its terms and start the engine"
 	fi
 fi
 
