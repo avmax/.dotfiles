@@ -82,9 +82,15 @@ After changing any of these files, open a new tab or run `exec zsh` (the
 | `myip` | the local address of each network connection, then your public IP |
 | `cls` | clear the screen and the scrollback |
 | `tree` | a simple folder tree, until you `brew install tree` |
+| `split3 [dir…]` | split this iTerm2 tab into equal columns, one per folder, each already `cd`'d in. With no folders: `~/Code/cognitiveos`, `here4you` and `realtor-doc` |
 
 `port` and `killport` only see your own processes; system services need
 `sudo lsof`. `myip` asks api.ipify.org for the public address.
+
+`split3` works in iTerm2 only, not inside tmux, and needs no permissions: it
+scripts iTerm2 from inside iTerm2. It checks every folder before splitting,
+so a typo leaves your tab as it was. To change the default folders, edit the
+`dirs=(…)` line in the function.
 
 All of them are in `custom-functions.zsh`, which opens with a one-line
 summary of every function in it.

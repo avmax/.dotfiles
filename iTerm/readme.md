@@ -72,6 +72,12 @@ produce the same file and the diff shows only what actually changed.
 Preview first with `DRY_RUN=1 ./iTerm/export.sh` — it prints the difference and
 writes nothing.
 
+## Three projects side by side
+
+`split3`, a zsh function, splits the current tab into equal columns and `cd`s
+each into a project — see [zsh/readme.md](../zsh/readme.md#functions). It
+drives iTerm2 over AppleScript, so it needs nothing from these settings.
+
 ## Rolling back
 
 Every install copies the settings it is about to replace into the backup dir:
