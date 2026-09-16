@@ -3,16 +3,22 @@
 ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 [[ -d $ZSH_CACHE_DIR ]] || mkdir -p "$ZSH_CACHE_DIR"
 
-# Extra definitions: zsh-completions first, Homebrew's (brew, deno, …) last.
+# Extra definitions: zsh-completions and Docker Desktop's (docker, kubectl)
+# first, Homebrew's (brew, deno, …) last.
 #
 # `brew shellenv` puts Homebrew's directory at the *front* of fpath. That lets
 # its files shadow zsh's own: node's _npm is a bash-style script zsh can't
 # register (so npm got no completion at all), and git's _git is thinner than
 # zsh's built-in one. Moved to the back, it only fills in what zsh lacks.
+#
+# Docker Desktop's first launch appends its own fpath line and a second
+# compinit to ~/.zshrc, which is this repo's zshrc. The entry below does the
+# same job without either, so those lines can go: git restore zsh/zshrc.
 typeset -U fpath
 _brew_site_functions="${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh/site-functions"
 fpath=(
   "${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins/zsh-completions/src"(N-/)
+  "$HOME/.docker/completions"(N-/)
   ${fpath:#$_brew_site_functions}
   $_brew_site_functions(N-/)
 )

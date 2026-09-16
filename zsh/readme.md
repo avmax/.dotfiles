@@ -12,7 +12,7 @@ from this folder, in the order below.
 
 | file | linked as | what it does |
 | --- | --- | --- |
-| `zprofile` | `~/.zprofile` | login shells: `PATH` with Homebrew first, `~/.local/bin`, VS Code's `code` |
+| `zprofile` | `~/.zprofile` | login shells: `PATH` with Homebrew first, `~/.local/bin`, VS Code's `code`, Docker Desktop's `~/.docker/bin` |
 | `zshrc` | `~/.zshrc` | interactive shells: loads everything below |
 | `options.zsh` | | editor, pager, history, directory and correction options |
 | `colors.zsh` | | every color: ls, completion lists, the command line, the prompt |
@@ -47,8 +47,9 @@ After changing any of these files, open a new tab or run `exec zsh` (the
   it, ⇧-Tab goes back.
 - Matching ignores case — `cd doc<Tab>` finds `Documents`.
 - git, npm, brew and hundreds of other commands complete their subcommands
-  and options. `nr <Tab>` completes the scripts in your package.json;
-  `kill <Tab>` lists your processes.
+  and options — docker and kubectl too, from Docker Desktop's own definitions
+  in `~/.docker/completions`. `nr <Tab>` completes the scripts in your
+  package.json; `kill <Tab>` lists your processes.
 
 ## Aliases
 
