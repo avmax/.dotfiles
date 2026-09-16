@@ -29,9 +29,9 @@ Setting up a new Mac. More on any of this in [README.md](README.md).
    powerlevel10k wizard opening on the first tab is expected.
 
 6. Left by hand: opening Docker once, to accept its terms and start its
-   engine; `~/.gitconfig.local` for a work email or signing key; the macOS
-   tweaks under *Manual setup* in README; and tmux and vim, which have no
-   installer yet.
+   engine; running `claude` once to sign in; `~/.gitconfig.local` for a work
+   email or signing key; the macOS tweaks under *Manual setup* in README; and
+   tmux and vim, which have no installer yet.
 
 Keep the repo where it is — `~/.gitconfig`, `~/.zshrc` and `~/.zprofile` become
 symlinks into it, and moving the folder breaks them.

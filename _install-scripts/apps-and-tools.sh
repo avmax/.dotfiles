@@ -11,12 +11,14 @@
 #   PostgreSQL 18        Homebrew  postgresql@18, psql & co. linked onto PATH
 #   Docker               Homebrew Cask  docker-desktop (Docker Desktop, with
 #                        docker and docker compose)
+#   Claude Code          the installer from claude.ai (claude, updates itself)
 #
 # Desktop apps
 #
 #   iTerm2               Homebrew Cask  iterm2
 #   Google Chrome        Homebrew Cask  google-chrome
 #   Visual Studio Code   Homebrew Cask  visual-studio-code
+#   Claude               Homebrew Cask  claude
 #   Firefox              Homebrew Cask  firefox
 #   Telegram             Homebrew Cask  telegram
 #   AmneziaVPN           Homebrew Cask  amneziavpn
@@ -45,6 +47,7 @@ set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/zsh/custom-functions.zsh"
 
 HOMEBREW_INSTALLER=https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+CLAUDE_INSTALLER=https://claude.ai/install.sh
 POSTGRES=postgresql@18
 WIREGUARD_APP_STORE_ID=1451685025
 
@@ -217,11 +220,39 @@ else
 	fi
 fi
 
+# Claude Code, with Anthropic's own installer: claude lands in ~/.local/bin and
+# keeps itself up to date. zsh/zprofile puts ~/.local/bin on PATH for new
+# shells, but this may run before that. Having it on PATH first also keeps the
+# installer from adding it to shell profiles, which here are symlinks into this
+# repo.
+PATH="$HOME/.local/bin:$PATH"
+if on_path claude; then
+	ok "already installed: claude ($(pretty "$(command -v claude)"))"
+else
+	info "installing Claude Code"
+	if [ "$DRY_RUN" = "1" ]; then
+		run /bin/bash -c "\$(curl -fsSL $CLAUDE_INSTALLER)"
+	elif ! installer="$(curl -fsSL "$CLAUDE_INSTALLER")"; then
+		warn "could not download the Claude Code installer — check the network"
+		missing "Claude Code"
+	elif ! /bin/bash -c "$installer"; then
+		warn "the Claude Code installer failed — see above"
+		missing "Claude Code"
+	elif on_path claude; then
+		ok "installed claude ($(pretty "$(command -v claude)"))"
+		info "run claude once to sign in"
+	else
+		warn "the Claude Code installer finished, but there is no claude on PATH"
+		missing "Claude Code"
+	fi
+fi
+
 # --- desktop apps -------------------------------------------------------------
 
 install_app "iTerm.app"              brew install --cask iterm2
 install_app "Google Chrome.app"      brew install --cask google-chrome
 install_app "Visual Studio Code.app" brew install --cask visual-studio-code
+install_app "Claude.app"             brew install --cask claude
 install_app "Firefox.app"            brew install --cask firefox
 install_app "Telegram.app"           brew install --cask telegram
 install_app "AmneziaVPN.app"         brew install --cask amneziavpn

@@ -227,6 +227,7 @@ installed — however it got there.
 | python3, pip3 | Homebrew `python` |
 | PostgreSQL 18 | Homebrew `postgresql@18`, with `psql` and the rest linked onto `PATH` |
 | Docker | Homebrew Cask `docker-desktop` — Docker Desktop, with `docker` and `docker compose` |
+| Claude Code | the installer from [claude.ai](https://claude.ai/install.sh) — `claude` in `~/.local/bin`, which updates itself |
 
 **Desktop apps**
 
@@ -235,6 +236,7 @@ installed — however it got there.
 | iTerm2 | Homebrew Cask `iterm2` |
 | Google Chrome | Homebrew Cask `google-chrome` |
 | Visual Studio Code | Homebrew Cask `visual-studio-code` |
+| Claude | Homebrew Cask `claude` |
 | Firefox | Homebrew Cask `firefox` |
 | Telegram | Homebrew Cask `telegram` |
 | AmneziaVPN | Homebrew Cask `amneziavpn` |
@@ -255,6 +257,11 @@ Good to know:
   terms, then starts the engine that `docker` commands need. `docker compose`
   answers "unknown command" until then — Docker Desktop sets up its CLI
   plugins on the first launch.
+- **Claude Code updates itself** (`claude update` does it right away). Run
+  `claude` once to sign in; `claude doctor` checks the install. The script puts
+  `~/.local/bin` on `PATH` before running Anthropic's installer, so the
+  installer doesn't add it to `~/.zshrc` or `~/.zprofile` — symlinks into
+  this repo.
 - **Python is `python3` and `pip3`.** Homebrew keeps the unversioned `python`
   and `pip` in `$(brew --prefix python)/libexec/bin`, which isn't on `PATH`.
 - **Homebrew owned by another macOS user** makes `brew install` fail. The
