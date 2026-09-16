@@ -30,9 +30,9 @@
 # Docker.app is. An app counts when it's in /Applications or ~/Applications.
 #
 # Neither PostgreSQL nor Docker is started. `brew services start postgresql@18`
-# runs PostgreSQL now and at every login; open Docker once to accept its terms
-# and start its engine. If mas can't install WireGuard, its App Store page
-# opens instead.
+# runs PostgreSQL now and at every login. Open Docker once to accept its terms
+# and start its engine; `docker compose` only works after that. If mas can't
+# install WireGuard, its App Store page opens instead.
 #
 # The Homebrew installer, the AmneziaVPN and Docker Desktop installs, and mas
 # ask for your password. WireGuard needs an Apple Account signed in to the App
@@ -213,7 +213,7 @@ elif on_path docker; then
 else
 	install_app "Docker.app" brew install --cask docker-desktop
 	if [ "$DRY_RUN" != "1" ] && app_path "Docker.app" >/dev/null; then
-		info "not started — open Docker once to accept its terms and start the engine"
+		info "not started — open Docker once to accept its terms and start the engine; docker compose works after that"
 	fi
 fi
 
