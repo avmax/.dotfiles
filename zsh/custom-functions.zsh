@@ -25,6 +25,7 @@
 #   nr [script] [args...]  list scripts in the nearest package.json, or run one
 #   myip                   local IP of each active interface, then public IP
 #   cls                    clear the screen and the scrollback buffer
+#   split3 [dir...]        split this iTerm2 tab into a column per folder, cd'd in
 #   _nr_package_json       path of the nearest package.json (used by nr)
 #   _nr                    Tab completion of script names for nr
 #
@@ -356,6 +357,63 @@ cls() {
   printf '\e[H\e[2J\e[3J'
 }
 
-# split3 — see zsh/split3.zsh. Guarded so a branch without that file, or a Mac
-# part-way through an install, still gets a working shell.
-[[ -f "${0:A:h}/split3.zsh" ]] && source "${0:A:h}/split3.zsh"
+# --- iTerm2 -------------------------------------------------------------------
+
+# split3 [dir...] — split this iTerm2 tab into side-by-side columns, one per
+# folder, each cd'd into its folder; this pane becomes the first column. With
+# no folders: cognitiveos, here4you and realtor-doc in ~/Code.
+#
+# Drives iTerm2 over AppleScript, so nothing is installed into iTerm2 itself.
+# iTerm2 shares a row of panes out evenly, so the columns come out equal.
+split3() {
+  local -a dirs=("$@")
+  (( $#dirs )) || dirs=(~/Code/cognitiveos ~/Code/here4you ~/Code/realtor-doc)
+
+  if [[ $TERM_PROGRAM != iTerm.app || -z $ITERM_SESSION_ID ]]; then
+    print -u2 "split3: only works in iTerm2 (not inside tmux)"
+    return 1
+  fi
+
+  # Check every folder first, so a typo can't leave half-made columns behind.
+  local dir
+  local -a missing
+  for dir in $dirs; do
+    [[ -d $dir ]] || missing+=($dir)
+  done
+  if (( $#missing )); then
+    print -u2 "split3: no such folder: ${(j:, :)${(@D)missing}}"
+    return 1
+  fi
+
+  # A line to type into each new pane's shell. The leading space keeps it out
+  # of history (HIST_IGNORE_SPACE, options.zsh); (q) quotes the path.
+  local -a lines
+  for dir in ${dirs[2,-1]}; do
+    lines+=(" cd -- ${(q)${dir:A}} && clear")
+  done
+
+  # argv: this pane's id — the part of ITERM_SESSION_ID after the colon — then
+  # one line per new pane. The pane is found by id rather than by focus, so it
+  # is still the right one if another window comes to the front meanwhile.
+  # Each new pane is split off the one before it, left to right.
+  local script='on run argv
+    tell application "iTerm2"
+      set pane to missing value
+      repeat with w in windows
+        repeat with t in tabs of w
+          repeat with s in sessions of t
+            if (id of s) is (item 1 of argv) then set pane to s
+          end repeat
+        end repeat
+      end repeat
+      if pane is missing value then error "cannot find this pane in iTerm2"
+      repeat with i from 2 to (count of argv)
+        tell pane to set pane to (split vertically with same profile)
+        tell pane to write text (item i of argv)
+      end repeat
+    end tell
+  end run'
+  osascript -e "$script" "${ITERM_SESSION_ID#*:}" "${lines[@]}" >/dev/null || return
+
+  cd -- "${dirs[1]}" && clear
+}
