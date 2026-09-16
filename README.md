@@ -256,7 +256,11 @@ Good to know:
 - **Docker isn't started either.** Open Docker once: it asks you to accept its
   terms, then starts the engine that `docker` commands need. `docker compose`
   answers "unknown command" until then — Docker Desktop sets up its CLI
-  plugins on the first launch.
+  plugins on the first launch. That launch also writes lines into
+  `~/.zprofile` and `~/.zshrc`, which are this repo's files. The zsh config
+  already puts `~/.docker/bin` on `PATH` and loads Docker's completions, so
+  drop them: `git restore zsh/zprofile zsh/zshrc`. If Docker writes them again
+  later, `git diff zsh/` shows it.
 - **Claude Code updates itself** (`claude update` does it right away). Run
   `claude` once to sign in; `claude doctor` checks the install. The script puts
   `~/.local/bin` on `PATH` before running Anthropic's installer, so the

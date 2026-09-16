@@ -20,3 +20,9 @@ path=("$HOME/.local/bin"(N-/) "$HOME/bin"(N-/) $path)
 
 # Editor CLIs that live inside their app bundles: `code` (VS Code).
 path+=("/Applications/Visual Studio Code.app/Contents/Resources/app/bin"(N-/))
+
+# Docker Desktop's command-line tools. Homebrew's links in /usr/local/bin come
+# first; this adds docker-compose, which only lives here. Docker Desktop's
+# first launch prepends its own export of this to ~/.zprofile, which is this
+# repo's zprofile — that one can go: git restore zsh/zprofile.
+path+=("$HOME/.docker/bin"(N-/))
