@@ -355,3 +355,7 @@ myip() {
 cls() {
   printf '\e[H\e[2J\e[3J'
 }
+
+# split3 — see zsh/split3.zsh. Guarded so a branch without that file, or a Mac
+# part-way through an install, still gets a working shell.
+[[ -f "${0:A:h}/split3.zsh" ]] && source "${0:A:h}/split3.zsh"
