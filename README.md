@@ -252,7 +252,9 @@ Good to know:
 - **PostgreSQL isn't started.** `brew services start postgresql@18` runs it now
   and at every login.
 - **Docker isn't started either.** Open Docker once: it asks you to accept its
-  terms, then starts the engine that `docker` commands need.
+  terms, then starts the engine that `docker` commands need. `docker compose`
+  answers "unknown command" until then — Docker Desktop sets up its CLI
+  plugins on the first launch.
 - **Python is `python3` and `pip3`.** Homebrew keeps the unversioned `python`
   and `pip` in `$(brew --prefix python)/libexec/bin`, which isn't on `PATH`.
 - **Homebrew owned by another macOS user** makes `brew install` fail. The
